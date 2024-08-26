@@ -1,23 +1,208 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webphone Integration</title>
-    <!-- Inclua o arquivo webphone_api.js -->
+    <title>Softphone</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="{{ url_for('static', filename='webphone_api.js') }}"></script>
     <script src="{{ url_for('static', filename='webphone_config.js') }}"></script>
-    <!-- Outros arquivos JS ou CSS, se necessário -->
+    <style>
+        .inputPhone{
+            background-color: transparent;
+            border: none;
+        }
+        .bg-dark-custom {
+            background-color: #111826;
+        }
+        .bg-light-custom {
+            background-color: #1f2a38;
+        }
+        .phone-container {
+            width: 100%;
+            max-width: 500px;
+            height: 90vh;
+            padding: 40px;
+        }
+        .display-input {
+            height: 150px;
+            font-size: 3.5rem;
+        }
+        .active-btn{
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
+            background-color: rgba(17, 24, 38, .4) !important;
+        }
+        .button-numeric {
+            padding: 1.5rem;
+            font-size: 2.75rem;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            background-color: transparent;
+            transition: .2s;
+        }
+        .button-numeric:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
+            background-color: rgba(17, 24, 38, .4) !important;
+        }
+        .keypad-container {
+            margin-top: 10px;
+        }
+        .button-action {
+            color: aliceblue;
+            padding: 1.6rem;
+            font-size: 1.45rem;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: -30px;
+            margin-top: 20px;
+        }
+        .button-action:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            background-color: #28a745;
+        }
+        .button-hangup {
+            background-color: #dc3545;
+        }
+        .button-hangup:hover {
+            background-color: #c82333;
+        }
+        .button-call {
+            background-color: #28a745;
+        }
+        .button-call:hover {
+            background-color: #218838;
+        }
+        .sufix {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .number {
+            padding-bottom: 10px;
+        }
+    </style>
 </head>
-<body>
-    <h1>Webphone Interface</h1>
-    <!-- Adicione botões ou elementos para interagir com a API -->
-    <button onclick="makeCall()">Call</button>
-    <button onclick="hangUp()">Hang Up</button>
-    <button onclick="sendMessage()">Send Message</button>
+<body class="bg-dark-custom flex flex-col items-center justify-center min-h-screen">
+    <p class="text-white absolute top-0 left-0 m-4">{{full_name}}, {{phone_number}}</p>
 
+    <div class="w-full max-w-xs bg-light-custom shadow-lg rounded-lg p-6 phone-container flex flex-col">
+        <h1 class="text-2xl font-semibold mb-4 text-center text-white">Softphone</h1>
+
+        <div class="mb-4 number">
+            <input id="display" type="text" class="w-full border border-gray-700 rounded-lg p-4 text-center bg-gray-900 text-white focus:outline-none display-input inputPhone" maxlength="15">
+            <p id="description" class="text-center text-white mt-2 sufix"></p>
+        </div>
+
+        <div class="keypad-container grid grid-cols-3 gap-3 mb-4 flex-grow">
+            <button class="bg-gray-700 text-white rounded-lg button-numeric" onclick="addNumber('1')">1</button>
+            <button class="bg-gray-700 text-white rounded-lg button-numeric" onclick="addNumber('2')">2</button>
+            <button class="bg-gray-700 text-white rounded-lg button-numeric" onclick="addNumber('3')">3</button>
+
+            <button class="bg-gray-700 text-white rounded-lg button-numeric" onclick="addNumber('4')">4</button>
+            <button class="bg-gray-700 text-white rounded-lg button-numeric" onclick="addNumber('5')">5</button>
+            <button class="bg-gray-700 text-white rounded-lg button-numeric" onclick="addNumber('6')">6</button>
+
+            <button class="bg-gray-700 text-white rounded-lg button-numeric" onclick="addNumber('7')">7</button>
+            <button class="bg-gray-700 text-white rounded-lg button-numeric" onclick="addNumber('8')">8</button>
+            <button class="bg-gray-700 text-white rounded-lg button-numeric" onclick="addNumber('9')">9</button>
+
+            <button class="bg-gray-700 text-white rounded-lg button-numeric" onclick="addNumber('*')">*</button>
+            <button class="bg-gray-700 text-white rounded-lg button-numeric" onclick="addNumber('0')">0</button>
+            <button class="bg-gray-700 text-white rounded-lg button-numeric" onclick="addNumber('#')">#</button>
+        </div>
+
+        <div class="flex mb-4 space-x-4">
+            <button class="button-action button-call flex-1 rounded-lg" onclick="makeCall()">Ligar</button>
+            <button class="button-action button-hangup flex-1 rounded-lg" onclick="hangUp()">Desligar</button>
+        </div>
+    </div>
+
+    <form action="{{ url_for('logout') }}" method="POST" class="absolute bottom-0 left-0 m-4">
+        <button type="submit" class="bg-red-600 text-white py-2 px-4 rounded-lg">Sair</button>
+    </form>
+    <div id="line-details">Awaiting line details...</div>
+
+    <script src="{{ url_for('static', filename='softphone.js') }}"></script>
     <script>
-        window.onload = function() {
+    window.onload = function() {
+        const display = document.getElementById('display');
+        const description = document.getElementById('description');
+
+            function formatNumber(number) {
+                number = number.replace(/\D/g, ''); // Remove caracteres não numéricos
+                if (number.length <= 4) {
+                    return number;
+                } else if (number.length <= 10) {
+                    return `(${number.slice(0, 2)})${number.slice(2, 6)}-${number.slice(6)}`;
+                } else {
+                    return `(${number.slice(0, 2)})${number.slice(2, 7)}-${number.slice(7)}`;
+                }
+            }
+
+            function updateDescription(number) {
+                number = number.replace(/\D/g, '');
+                if (number.length === 11) {
+                    description.innerText = 'Número de Celular';
+                } else if (number.length === 10) {
+                    description.innerText = 'Número Fixo';
+                } else if (number.length === 4) {
+                    description.innerText = 'Ramal';
+                } else {
+                    description.innerText = '';
+                }
+            }
+
+            function addNumber(number) {
+                if (display.value.length < 15) {
+                    display.value += number;
+                    display.value = formatNumber(display.value);
+                    display.focus();
+                    updateDescription(display.value);
+                    markButton(number);
+                }
+            }
+
+            function handleBackspace() {
+                display.focus();
+                let value = display.value.replace(/\D/g, '');
+                value = value.slice(0, -1);
+                display.value = formatNumber(value);
+                updateDescription(display.value);
+            }
+
+            function markButton(number) {
+                const buttons = document.querySelectorAll('button');
+                buttons.forEach(button => {
+                    button.classList.remove('active-btn');
+                });
+                const button = document.querySelector(`button[onclick="addNumber('${number}')"]`);
+                if (button) {
+                    button.classList.add('active-btn');
+                    setTimeout(() => {
+                        button.classList.remove('active-btn');
+                    }, 200);
+                }
+            }
+
+            function handleInput(event) {
+                const value = display.value.replace(/\D/g, '');
+                display.value = formatNumber(value);
+                updateDescription(display.value);
+            }
+
+            display.addEventListener('input', handleInput);
+
+            document.addEventListener('keydown', function(event) {
+            if (event.key >= '0' && event.key <= '9') {
+                event.preventDefault(); // Impede que o número seja adicionado diretamente ao input
+                addNumber(event.key);
+            } else if (event.key === 'Backspace') {
+                event.preventDefault(); // Impede a exclusão padrão
+                handleBackspace();
+            } else if (event.key === 'Enter') {
+                event.preventDefault(); // Impede o comportamento padrão do Enter
+                makeCall(); // Chama a função para fazer a ligação
+            }
+        });
+
             if (typeof webphone_api !== 'undefined') {
                 webphone_api.onAppStateChange(function (state) {
                     if (state === 'loaded') {
@@ -28,29 +213,23 @@
                     }
                 });
 
-                // Tornando as funções globais
+                window.addNumber = addNumber;
+
                 window.makeCall = function() {
-                    var number = prompt("Enter the number to call:");
+                    var number = display.value.replace(/\D/g, '');
                     if (number) {
                         webphone_api.call(number);
+                        display.value = '';
                     }
                 };
 
                 window.hangUp = function() {
                     webphone_api.hangup();
                 };
-
-                window.sendMessage = function() {
-                    var number = prompt("Enter the recipient number:");
-                    var message = prompt("Enter your message:");
-                    if (number && message) {
-                        webphone_api.sendchat(number, message);
-                    }
-                };
             } else {
-                console.error('webphone_api is not defined');
+                console.error('webphone_api não está definido');
             }
         };
+
     </script>
 </body>
-</html>

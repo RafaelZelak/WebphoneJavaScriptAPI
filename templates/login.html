@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body class="bg-gray-900 text-white flex items-center justify-center min-h-screen px-4">
-    <div class="w-full max-w-md p-8 bg-gray-800 rounded-lg shadow-lg" style="min-height: 400px; display: flex; flex-direction: column; justify-content: center;">
+    <div class="w-full max-w-md p-8 bg-gray-800 rounded-lg shadow-lg login" style="min-height: 400px; display: flex; flex-direction: column; justify-content: center;">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <div id="alert-container" class="fixed top-0 left-0 w-full p-4">

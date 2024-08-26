@@ -1,0 +1,70 @@
+.inputPhone{
+    background-color: transparent;
+    border: none;
+}
+.bg-dark-custom {
+    background-color: #111826;
+}
+.bg-light-custom {
+    background-color: #1f2a38;
+}
+.phone-container {
+    width: 100%;
+    max-width: 500px;
+    height: 90vh;
+    padding: 40px;
+}
+.display-input {
+    height: 150px;
+    font-size: 3.5rem;
+}
+.active-btn{
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
+    background-color: rgba(17, 24, 38, .4) !important;
+}
+.button-numeric {
+    padding: 1.5rem;
+    font-size: 2.75rem;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    background-color: transparent;
+    transition: .2s;
+}
+.button-numeric:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
+    background-color: rgba(17, 24, 38, .4) !important;
+}
+.keypad-container {
+    margin-top: 10px;
+}
+.button-action {
+    color: aliceblue;
+    padding: 1.6rem;
+    font-size: 1.45rem;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: -30px;
+    margin-top: 20px;
+}
+.button-action:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    background-color: #28a745;
+}
+.button-hangup {
+    background-color: #dc3545;
+}
+.button-hangup:hover {
+    background-color: #c82333;
+}
+.button-call {
+    background-color: #28a745;
+}
+.button-call:hover {
+    background-color: #218838;
+}
+.sufix {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.number {
+    padding-bottom: 10px;
+}
