@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webphone Integration</title>
+    <!-- Inclua o arquivo webphone_api.js -->
+    <script src="{{ url_for('static', filename='webphone_api.js') }}"></script>
+    <script src="{{ url_for('static', filename='webphone_config.js') }}"></script>
+    <!-- Outros arquivos JS ou CSS, se necessário -->
+</head>
+<body>
+    <h1>Webphone Interface</h1>
+    <!-- Adicione botões ou elementos para interagir com a API -->
+    <button onclick="makeCall()">Call</button>
+    <button onclick="hangUp()">Hang Up</button>
+    <button onclick="sendMessage()">Send Message</button>
+
+    <script>
+        window.onload = function() {
+            if (typeof webphone_api !== 'undefined') {
+                webphone_api.onAppStateChange(function (state) {
+                    if (state === 'loaded') {
+                        webphone_api.setparameter('serveraddress', '192.168.15.252');
+                        webphone_api.setparameter('username', '{{ phone_number }}');
+                        webphone_api.setparameter('password', '{{ secret }}');
+                        webphone_api.start();
+                    }
+                });
+
+                // Tornando as funções globais
+                window.makeCall = function() {
+                    var number = prompt("Enter the number to call:");
+                    if (number) {
+                        webphone_api.call(number);
+                    }
+                };
+
+                window.hangUp = function() {
+                    webphone_api.hangup();
+                };
+
+                window.sendMessage = function() {
+                    var number = prompt("Enter the recipient number:");
+                    var message = prompt("Enter your message:");
+                    if (number && message) {
+                        webphone_api.sendchat(number, message);
+                    }
+                };
+            } else {
+                console.error('webphone_api is not defined');
+            }
+        };
+    </script>
+</body>
+</html>
