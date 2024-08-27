@@ -21,9 +21,9 @@ function Start() // function called on "Register" button click to start the webp
 {
     td_started = true;
     InitializeTextInputs();
-    
+
     SaveSettings();
-    
+
     DisplayStatus('EVENT, Initializing...');
 
     webphone_api.start();
@@ -64,11 +64,11 @@ webphone_api.onAppStateChange(function (state)
         if (sipusername.length > 0) { sipusername_input.value = sipusername; }
         if (password.length > 0) { password_input.value = password; }
         if (destination.length > 0) { destination_input.value = destination; }
-        
+
         var rcolumn = document.getElementById('right_column');
         var btnadv = document.getElementById('btn_advanced_sett');
         if (isNull(rcolumn) || isNull(btnadv)) { return; }
-        
+
         if (rcolumn.style.display === 'none')
         {
             btnadv.innerHTML = 'Show more settings';
@@ -133,7 +133,7 @@ webphone_api.onCallStateChange(function (status, direction, peername, peerdispla
 
         // if it's an incoming call, then display popup with Accept/Reject buttons
         if (direction === 2)
-        {    
+        {
             AcceptRejectPopup(ringingNumber);
         }
     }
@@ -159,29 +159,29 @@ function SendChat()
 {
     InitializeTextInputs();
     var msgF = document.getElementById('message');
-    
+
     var to = destination_input.value;
     var msg = msgF.value;
-    
+
     if (isNull(to) || (Trim(to)).length < 1)
     {
         DisplayStatus('ERROR, Invalid chat destination number');
         destination_input.focus();
         return;
     }
-    
+
     if (isNull(msg) || (Trim(msg)).length < 1)
     {
         DisplayStatus('ERROR, Enter chat message to be sent');
         msgF.focus();
         return;
     }
-    
+
     msgF.value = '';
-    
+
 // Displays messages in chat form window
     AddMessageToHistory('Me', msg);
-    
+
     webphone_api.sendchat(to, msg);
 }
 
@@ -190,9 +190,9 @@ webphone_api.onChat(function (from, msg, line)
 {
     InitializeTextInputs();
     if (isNull(from) || isNull(msg)) { return; }
-    
+
     var currdest = destination_input.value;
-    
+
     if (isNull(currdest) || (Trim(currdest)).length < 1)
     {
         destination_input.value = from;
@@ -204,7 +204,7 @@ webphone_api.onChat(function (from, msg, line)
             destination_input.value = from;
         }
     }
-    
+
 // Displays messages in chat form window
     AddMessageToHistory(from, msg);
 });
@@ -214,11 +214,11 @@ function AddMessageToHistory(to, message)
 {
     var sentmsgF = document.getElementById('msg_list');
     var msgconttent = sentmsgF.innerHTML;
-    
+
     if (isNull(msgconttent)) { msgconttent = ''; }
-    
+
     var item = '';
-    
+
     if (!isNull(to) && to.length > 0)
     {
         item = '<b>' + to + ':</b><p>' + message + '</p><p class="date">' + GetDateForMessage() + '</p>';
@@ -226,9 +226,9 @@ function AddMessageToHistory(to, message)
     {
         item = '<p>' + message + '</p>';
     }
-    
+
     msgconttent = msgconttent + item + '<br />';
-    
+
     sentmsgF.innerHTML = msgconttent;
 // scroll to bottom
     var d = $('#msg_list');
@@ -252,7 +252,7 @@ function GetDateForMessage()
 
     var datestr = month[date.getMonth()] + ', ' + day + ' ' + date.getFullYear()+ ' '
             + date.getHours() + ':' + minutes;
-    
+
     return datestr;
 
     } catch(err) { PutToDebugLogException(2, "_message: GetDateForMessage", err); }
@@ -278,13 +278,13 @@ function ProcessNotifications(not)
 {
     try{
     if (isNull(not) || not.length < 1) { return; }
-    
+
     not = Trim(not);
-    
+
     var type = '';
     var line = '';
     var notifyword = '';
-    
+
     //STATUS,1,Ringing,8888,9999,2,8888
     var pos = not.indexOf(',');
     if (pos > 0)
@@ -292,7 +292,7 @@ function ProcessNotifications(not)
         type = Trim(not.substring(0, pos));
         not = Trim(not.substring(pos + 1));
     }
-    
+
 // get line
     pos = not.indexOf(',');
     if (pos > 0)
@@ -305,7 +305,7 @@ function ProcessNotifications(not)
     }
 
     var notifywordcontent = '';
-    
+
 // clear junk of notifyword's end
     pos = notifyword.indexOf(',');
     if (pos > 0)
@@ -317,17 +317,17 @@ function ProcessNotifications(not)
     if (pos > 0) { notifyword = Trim(notifyword.substring(0, pos)); }
     pos = notifywordcontent.indexOf('[');
     if (pos > 0) { notifywordcontent = Trim(notifywordcontent.substring(0, pos)); }
-    
-    
+
+
 // handle incoming call
     if (type === 'STATUS')
     {
         // you can futher process/use the received status event messages
         // check the documentation for more details
     }
-    
+
     DisplayStatus(type + ',' + notifyword);
-    
+
     } catch(err)
     {
         PutToDebugLogException(2, 'live_demo: ProcessNotifications', err);
@@ -347,7 +347,7 @@ function AcceptRejectPopup(from)
     }
     armodal = webphone_api.picoModal(
     {
-        content: 
+        content:
             '<div id="ce_modal" class="modal" style="color: #212121;">'+
                 '<div id="ce_modal_header" class="modal_header_custom" style="height: 2.2em; line-height: 2.2em; margin: 0; background: #e8e8e8; text-align: center; color: #212121; font-weight: bold;">' +
                     'Incoming call' +
@@ -413,9 +413,9 @@ function AcceptRejectPopup(from)
         modal.destroy(); // must be called, otherwise on next show() the onclick will not work
         armodal = null;
     });
-    
+
     armodal.show();
-    
+
     $("#btn_np_positive").on("click", function ()
     {
         armodal.close();
@@ -429,8 +429,9 @@ function AcceptRejectPopup(from)
         PutToDebugLog(5,"EVENT, live_demo AcceptRejectPopup Reject onclick");
         Reject(6);
     });
-    
+
     } catch(err) { PutToDebugLogException(2, 'live_demo: AcceptRejectPopup', err); }
+
 }
 
 /** display events/status messages for the user*/
@@ -440,34 +441,34 @@ function DisplayStatus(msg_orig)
     try{
     var msg = msg_orig;
     if (isNull(status_e)) { status_e = document.getElementById('status'); }
-    
+
     if (isNull(msg) || msg.length < 1) { msg = '&nbsp;'; }
     if (msg.toLowerCase().indexOf('subscribe') >= 0) { return; }
-    
+
     if (msg.indexOf('ERROR') >= 0)
     {
         msg = msg.replace('ERROR', '');
         msg = Trim(msg);
-        
+
         if (msg.indexOf(',') === 0)
         {
             msg = msg.replace(',', '');
             msg = Trim(msg);
         }
-        
+
         msg = '<span style="color:red;">' + msg + '</span>';
     }
     else if (msg.indexOf('WARNING') >= 0)
     {
         msg = msg.replace('WARNING', '');
         msg = Trim(msg);
-        
+
         if (msg.indexOf(',') === 0)
         {
             msg = msg.replace(',', '');
             msg = Trim(msg);
         }
-        
+
         msg = '<span style="color: #ff6600;">' + msg + '</span>';
     }
     else if (msg.indexOf('STATUS') >= 0 || msg.indexOf('EVENT') >= 0)
@@ -475,17 +476,17 @@ function DisplayStatus(msg_orig)
         msg = msg.replace('STATUS', '');
         msg = msg.replace('EVENT', '');
         msg = Trim(msg);
-        
+
         if (msg.indexOf(',') === 0)
         {
             msg = msg.replace(',', '');
             msg = Trim(msg);
         }
     }
-    
+
     status_e.innerHTML = msg;
     PutToDebugLog(2, 'NOT: ' + msg_orig);
-    
+
     } catch(err) { PutToDebugLogException(2, 'live_demo: DisplayStatus', err); }
 }
 
@@ -629,9 +630,9 @@ function SaveSettings()
         lastoop = 23;
     SaveSett('webrtcserveraddress');
         lastoop = 24;
-    
+
     DisplayStatus('EVENT,Saved');
-    
+
     } catch(err)
     {
         PutToDebugLogException(2, 'live_demo: SaveSettings '+lastoop.toString(), err);
@@ -644,9 +645,9 @@ function ShowHideAdvancedSettings()
     var rcolumn = document.getElementById('right_column');
     var btnadv = document.getElementById('btn_advanced_sett');
     if (isNull(rcolumn) || isNull(btnadv)) { return; }
-    
+
     btnadv.style.display = 'none';
-    
+
     if (rcolumn.style.display === 'none')
     {
         document.getElementById('left_column').style.marginLeft = '0';
@@ -671,7 +672,7 @@ function isNull (variable)
         return false;
     }
     } catch(err) { PutToDebugLogException(2, "common: isNull", err); }
-    
+
     return true;
 }
 
@@ -679,12 +680,12 @@ function Trim(str)
 {
     try{
     if (isNull(str) || str.length < 1) { return ''; }
-    
+
     str = str.toString();
-    return str.replace(/^\s+|\s+$/g, ''); 
-    
+    return str.replace(/^\s+|\s+$/g, '');
+
     } catch(err) { PutToDebugLogException(2, "common: Trim", err); }
-    
+
     return str;
 }
 
@@ -698,11 +699,11 @@ function GetBrowser ()
     if (isNull(browserName) || isNull(browserName2))
     {
         var browser = navigator.userAgent.toLowerCase();
-        
+
         PutToDebugLog(2, "EVENT, common: GetBrowser name: " + browser);
 
         // order is important here.  Safari userAgent contains mozilla,
-        // IE 11 userAgent contains mozilla and netscape, 
+        // IE 11 userAgent contains mozilla and netscape,
         // and Chrome userAgent contains both mozilla and safari.
         if ((browser.indexOf('edge') !== -1))
         {
@@ -764,11 +765,11 @@ function GetBrowser ()
             browserName = '?';
             browserName2 = 'unknown';
         }
-        
+
         PutToDebugLog(2, "EVENT, common: GetBrowser Detected browser name: " + browserName + ";  " + browserName2);
     }
     } catch(err) { PutToDebugLogException(2, "common: GetBrowser", err); }
-    
+
     return browserName2;
 }
 

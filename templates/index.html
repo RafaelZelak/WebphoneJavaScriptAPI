@@ -20,14 +20,16 @@
         }
         .phone-container {
             width: 100%;
-            max-width: 500px;
-            height: 90vh;
-            padding: 40px;
+            max-width: 450px;
+            height: 88vh;
+            padding: 45px;
+            background-color: #1f2a38a7 !important;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
         .display-input {
             height: 150px;
-            font-size: 3.5rem;
+            width: 102%;
+            font-size: 3rem;
         }
         .active-btn{
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
@@ -35,7 +37,7 @@
         }
         .button-numeric {
             padding: 1.5rem;
-            font-size: 2.45rem;
+            font-size: 1.8rem;
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
             background-color: transparent;
             transition: .2s;
@@ -85,7 +87,7 @@
     <p class="text-white absolute top-0 left-0 m-4 text-xl">{{full_name}}, {{phone_number}}</p>
 
     <div class="w-full max-w-xs bg-light-custom shadow-lg rounded-lg p-6 phone-container flex flex-col">
-        <h1 class="text-2xl font-semibold mb-4 text-center text-white">Softphone Setup</h1>
+        <h1 id="title" class="text-2xl font-semibold mb-4 text-center text-white">Softphone Setup</h1>
 
         <div class="mb-4 number">
             <input id="display" type="text" class="w-full border border-gray-700 rounded-lg p-4 text-center bg-gray-900 text-white focus:outline-none display-input inputPhone" maxlength="15">
@@ -120,150 +122,277 @@
     </form>
     <div id="call-status" style="display: none;">Status da Chamada: Desconhecido</div>
 
-
     <script src="{{ url_for('static', filename='softphone.js') }}"></script>
     <script>
-window.onload = function() {
-    const display = document.getElementById('display');
-    const description = document.getElementById('description');
-    const callStatus = document.getElementById('call-status');
-    const callButton = document.getElementById('call-button'); // Referência ao botão
+        window.onload = function() {
+            const display = document.getElementById('display');
+            const description = document.getElementById('description');
+            const callStatus = document.getElementById('call-status');
+            const callButton = document.getElementById('call-button'); // Referência ao botão
+            const title = document.getElementById('title'); // Referência ao <h1>
 
-    function formatNumber(number) {
-        number = number.replace(/\D/g, ''); // Remove caracteres não numéricos
-        if (number.length <= 4) {
-            return number;
-        } else if (number.length <= 10) {
-            return `(${number.slice(0, 2)})${number.slice(2, 6)}-${number.slice(6)}`;
-        } else {
-            return `(${number.slice(0, 2)})${number.slice(2, 7)}-${number.slice(7)}`;
-        }
-    }
+            let callStartTime = null;  // Armazena o horário de início da chamada
+            let timerInterval = null;  // Armazena o ID do intervalo para parar o contador
 
-    function updateDescription(number) {
-        number = number.replace(/\D/g, '');
-        if (number.length === 11) {
-            description.innerText = 'Número de Celular';
-        } else if (number.length === 10) {
-            description.innerText = 'Número Fixo';
-        } else if (number.length === 4) {
-            description.innerText = 'Ramal';
-        } else {
-            description.innerText = '';
-        }
-    }
+            function formatNumber(number) {
+                if (number.includes('*') || number.includes('#')) {
+                    return number;
+                }
+                number = number.replace(/\D/g, '');
 
-    function addNumber(number) {
-        if (display.value.length < 15) {
-            display.value += number;
-            display.value = formatNumber(display.value);
-            display.focus();
-            updateDescription(display.value);
-            markButton(number);
-        }
-    }
-
-    function handleBackspace() {
-        display.focus();
-        let value = display.value.replace(/\D/g, '');
-        value = value.slice(0, -1);
-        display.value = formatNumber(value);
-        updateDescription(display.value);
-    }
-
-    function markButton(number) {
-        const buttons = document.querySelectorAll('button');
-        buttons.forEach(button => {
-            button.classList.remove('active-btn');
-        });
-        const button = document.querySelector(`button[onclick="addNumber('${number}')"]`);
-        if (button) {
-            button.classList.add('active-btn');
-            setTimeout(() => {
-                button.classList.remove('active-btn');
-            }, 200);
-        }
-    }
-
-    function handleInput(event) {
-        const value = display.value.replace(/\D/g, '');
-        display.value = formatNumber(value);
-        updateDescription(display.value);
-    }
-
-    function updateCallStatus() {
-        if (typeof webphone_api !== 'undefined') {
-            const isInCall = webphone_api.isincall();
-            callStatus.innerText = isInCall ? 'Status da Chamada: Em Chamada' : 'Status da Chamada: Fora de Chamada';
-            updateButtonState(isInCall);
-        }
-    }
-
-    function updateButtonState(isInCall) {
-        if (isInCall) {
-            callButton.innerText = 'Desligar';
-            callButton.classList.remove('button-call');
-            callButton.classList.add('button-hangup');
-            callButton.setAttribute('onclick', 'hangUp()');
-        } else {
-            callButton.innerText = 'Ligar';
-            callButton.classList.remove('button-hangup');
-            callButton.classList.add('button-call');
-            callButton.setAttribute('onclick', 'makeCall()');
-        }
-    }
-
-    display.addEventListener('input', handleInput);
-
-    document.addEventListener('keydown', function(event) {
-        if (event.key >= '0' && event.key <= '9') {
-            event.preventDefault(); // Impede que o número seja adicionado diretamente ao input
-            addNumber(event.key);
-        } else if (event.key === 'Backspace') {
-            event.preventDefault(); // Impede a exclusão padrão
-            handleBackspace();
-        } else if (event.key === 'Enter') {
-            event.preventDefault(); // Impede o comportamento padrão do Enter
-            makeCall(); // Chama a função para fazer a ligação
-        }
-    });
-
-    if (typeof webphone_api !== 'undefined') {
-        webphone_api.onAppStateChange(function (state) {
-            if (state === 'loaded') {
-                webphone_api.setparameter('serveraddress', '192.168.15.252');
-                webphone_api.setparameter('username', '{{ phone_number }}');
-                webphone_api.setparameter('password', '{{ secret }}');
-                webphone_api.setparameter('loglevel', '1');
-                webphone_api.start();
+                if (number.length === 0) {
+                    return '';
+                } else if (number.length <= 2) {
+                    return `(${number}`;
+                } else if (number.length <= 6) {
+                    return `(${number.slice(0, 2)}) ${number.slice(2)}`;
+                } else if (number.length <= 10) {
+                    return `(${number.slice(0, 2)}) ${number.slice(2, 7)}-${number.slice(7)}`;
+                } else {
+                    return `(${number.slice(0, 2)}) ${number.slice(2, 7)}-${number.slice(7, 11)} ${number.slice(11)}`;
+                }
             }
-        });
 
-        window.addNumber = addNumber;
+            function updateDescription(number) {
+                number = number.replace(/\D/g, '');
 
-        window.makeCall = function() {
-        var number = display.value.replace(/\D/g, '');
-        if (number) {
-            webphone_api.call(number);
-            display.value = '';
-        } else {
-            display.value = 'Digite um número';
-            setTimeout(function() {
-                display.value = '';
-            }, 1000);
+                if (number.length === 4) {
+                    description.innerText = 'Ramal';
+                } else if (number.length >= 10) {
+                    const firstDigitAfterDDD = number[2];
+                    if (firstDigitAfterDDD >= '2' && firstDigitAfterDDD <= '5') {
+                        description.innerText = 'Número Fixo';
+                    } else if (firstDigitAfterDDD >= '6' && firstDigitAfterDDD <= '9') {
+                        description.innerText = 'Número de Celular';
+                    } else {
+                        description.innerText = '';
+                    }
+                } else {
+                    description.innerText = '';
+                }
+            }
+
+            function addNumber(number) {
+                if (display.value.length < 15) {
+                    display.value += number;
+                    display.value = formatNumber(display.value);
+                    display.focus();
+                    updateDescription(display.value);
+                    markButton(number);
+                }
+            }
+
+            function handleBackspace() {
+                display.focus();
+                let value = display.value.replace(/\D/g, '');
+                value = value.slice(0, -1);
+                display.value = formatNumber(value);
+                updateDescription(display.value);
+            }
+
+            function markButton(number) {
+                const buttons = document.querySelectorAll('button');
+                buttons.forEach(button => {
+                    button.classList.remove('active-btn');
+                });
+                const button = document.querySelector(`button[onclick="addNumber('${number}')"]`);
+                if (button) {
+                    button.classList.add('active-btn');
+                    setTimeout(() => {
+                        button.classList.remove('active-btn');
+                    }, 200);
+                }
+            }
+
+            function handleInput(event) {
+                const value = display.value.replace(/\D/g, '');
+                display.value = formatNumber(value);
+                updateDescription(display.value);
+            }
+
+            function updateCallStatus() {
+                if (typeof webphone_api !== 'undefined') {
+                    const isInCall = webphone_api.isincall();
+
+                    if (isInCall) {
+                        if (!callStartTime) {
+                            callStartTime = new Date();
+                            startTimer();
+                        }
+                        callStatus.innerText = `Status da Chamada: Em Chamada - ${formatTime(getElapsedTime())}`;
+                        title.innerText = `Em Chamada - ${formatTime(getElapsedTime())}`;
+                    } else {
+                        if (callStartTime) {
+                            callStartTime = null;
+                            stopTimer();
+                        }
+                        callStatus.innerText = 'Status da Chamada: Fora de Chamada';
+                        title.innerText = 'Softphone Setup';
+                    }
+                    updateButtonState(isInCall);
+                }
+            }
+
+            function startTimer() {
+                timerInterval = setInterval(() => {
+                    if (callStartTime) {
+                        title.innerText = `Em Chamada - ${formatTime(getElapsedTime())}`;
+                    }
+                }, 1000);
+            }
+
+            function stopTimer() {
+                clearInterval(timerInterval);
+            }
+
+            function getElapsedTime() {
+                if (!callStartTime) return 0;
+                const now = new Date();
+                return Math.floor((now - callStartTime) / 1000);
+            }
+
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            }
+
+            function updateButtonState(isInCall) {
+                if (isInCall) {
+                    callButton.innerText = 'Desligar';
+                    callButton.classList.remove('button-call');
+                    callButton.classList.add('button-hangup');
+                    callButton.setAttribute('onclick', 'hangUp()');
+                } else {
+                    callButton.innerText = 'Ligar';
+                    callButton.classList.remove('button-hangup');
+                    callButton.classList.add('button-call');
+                    callButton.setAttribute('onclick', 'makeCall()');
+                }
+            }
+
+            display.addEventListener('input', handleInput);
+
+            document.addEventListener('keydown', function(event) {
+                if (event.key >= '0' && event.key <= '9') {
+                    event.preventDefault();
+                    addNumber(event.key);
+                } else if (event.key === 'Backspace') {
+                    event.preventDefault();
+                    handleBackspace();
+                } else if (event.key === 'Enter') {
+                    event.preventDefault();
+                    makeCall();
+                }
+            });
+
+            if (typeof webphone_api !== 'undefined') {
+                webphone_api.onAppStateChange(function (state) {
+                    if (state === 'loaded') {
+                        webphone_api.setparameter('serveraddress', '192.168.15.252');
+                        webphone_api.setparameter('username', '{{ phone_number }}');
+                        webphone_api.setparameter('password', '{{ secret }}');
+                        webphone_api.setparameter('loglevel', '1');
+                        webphone_api.start();
+                    }
+                });
+
+                window.addNumber = addNumber;
+
+                window.makeCall = function() {
+                    var number = display.value.replace(/\D/g, '');
+                    if (number) {
+                        webphone_api.call(number);
+                        display.value = '';
+                    } else {
+                        display.value = 'Digite um número';
+                        setTimeout(function() {
+                            display.value = '';
+                        }, 1000);
+                    }
+                };
+
+                window.hangUp = function() {
+                    webphone_api.hangup();
+                };
+
+                // Inicia o polling para atualizar o status da chamada
+                setInterval(updateCallStatus, 200); // Atualiza o status a cada 200ms
+
+                // Novo código inserido
+                webphone_api.onCallStateChange(function (status, direction, peername, peerdisplayname, line) {
+                    if (status === 'setup') {
+                        ringingNumber = peername;
+                        if (direction === 2)
+                            {
+                                CallPopup(peername);
+                            }
+
+                    }
+                });
+            } else {
+                console.error('webphone_api não está definido');
+            }
+        };
+        function Hangup()
+        {
+            webphone_api.hangup();
         }
+
+        function Accept()
+        {
+            webphone_api.accept();
+        }
+
+        function CallPopup() {
+    // Criação do container principal
+    const popupContainer = document.createElement('div');
+    popupContainer.className = 'fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50';
+
+    // Criação do conteúdo do popup
+    const popupContent = document.createElement('div');
+    popupContent.className = 'bg-white rounded-lg shadow-lg p-6 max-w-sm w-full';
+
+    // Texto de aviso ou título
+    const popupText = document.createElement('p');
+    popupText.className = 'text-xl font-semibold text-gray-800 mb-4 text-center';
+    popupText.innerText = 'Incoming Call';
+
+    // Botões de ação
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'flex justify-between';
+
+    const hangupButton = document.createElement('button');
+    hangupButton.className = 'bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded';
+    hangupButton.innerText = 'Hangup';
+    hangupButton.onclick = function() {
+        webphone_api.hangup();
+        document.body.removeChild(popupContainer);
     };
 
-        window.hangUp = function() {
-            webphone_api.hangup();
-        };
+    const acceptButton = document.createElement('button');
+    acceptButton.className = 'bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded';
+    acceptButton.innerText = 'Accept';
+    acceptButton.onclick = function() {
+        webphone_api.accept();
+        document.body.removeChild(popupContainer);
+    };
 
-        // Inicia o polling para atualizar o status da chamada
-        setInterval(updateCallStatus, 200); // Atualiza o status a cada segundo
-    } else {
-        console.error('webphone_api não está definido');
-    }
-};
+    // Adicionando botões ao container
+    buttonContainer.appendChild(hangupButton);
+    buttonContainer.appendChild(acceptButton);
 
-    </script>
+    // Adicionando conteúdo ao popup
+    popupContent.appendChild(popupText);
+    popupContent.appendChild(buttonContainer);
+
+    // Adicionando o popup ao container principal
+    popupContainer.appendChild(popupContent);
+
+    // Adicionando o popup ao body
+    document.body.appendChild(popupContainer);
+}
+
+        </script>
+
 </body>
