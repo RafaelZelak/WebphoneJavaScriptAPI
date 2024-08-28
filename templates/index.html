@@ -37,7 +37,7 @@
         .display-input {
             height: 100px;
             width: 100%;
-            font-size: 2rem;
+            font-size: 2.5rem;
             text-align: center;
         }
 
@@ -48,7 +48,7 @@
 
         .button-numeric {
             padding: 1.2rem;
-            font-size: 1.5rem;
+            font-size: 2rem;
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
             background-color: transparent;
             transition: .2s;
@@ -67,8 +67,8 @@
 
         .button-action {
             color: aliceblue;
-            padding: 1.5rem;
-            font-size: 1.25rem;
+            padding: 1rem;
+            font-size: 1.4rem;
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
 
@@ -117,27 +117,62 @@
         .exit:hover{
             color: #ff4444;
         }
+        .aviso{
+            display: none;
+        }
 
-        @media screen and (min-width: 768px) {
-            .display-input {
-                height: 120px;
-                font-size: 3.5rem;
+
+        @media screen and (max-height: 840px) {
+            .phone-container {
+                max-width: 450px;
+                height: auto;
             }
 
             .button-numeric {
-                padding: 1.75rem;
-                font-size: 2.3rem;
+                padding: 0.75rem;
+                font-size: 2rem;
             }
 
             .button-action {
-                padding: 2rem;
-                font-size: 1.5rem;
+                padding: 1rem;
+                font-size: 1.4rem;
+            }
+
+            .display-input {
+                height: 80px;
+                font-size: 2.5rem;
             }
         }
 
-        @media screen and (max-height: 700px) {
+        @media screen and (max-height: 730px) {
             .phone-container {
                 max-width: 450px;
+                height: auto;
+            }
+
+            .button-numeric {
+                padding: 0.75rem;
+                font-size: 2rem;
+            }
+
+            .button-action {
+                padding: 1rem;
+                font-size: 1.4rem;
+            }
+
+            .display-input {
+                height: 80px;
+                font-size: 2.5rem;
+            }
+        }
+
+        @media screen and (max-height: 650px) {
+            .keypad-container{
+                display: none;
+            }
+            .phone-container {
+                max-width: 450px;
+                height: auto;
             }
 
             .button-numeric {
@@ -147,13 +182,23 @@
 
             .button-action {
                 padding: 1rem;
-                font-size: 1rem;
+                font-size: 2rem;
             }
 
             .display-input {
                 height: 80px;
-                font-size: 1.5rem;
+                font-size: 2.5rem;
             }
+            .aviso{
+                display: block;
+            }
+        }
+        #mute-icon{
+            width: 30px;
+            height: 30px;
+            position: absolute;
+            margin-left: -30px;
+            margin-top: -55px;
         }
     </style>
 </head>
@@ -194,6 +239,10 @@
         <div class="flex mb-4 space-x-4">
             <button id="call-button" class="button-action button-call flex-1 rounded-lg" onclick="makeCallHandler()">Ligar</button>
         </div>
+        <button id="muteButton">
+            <img id="mute-icon" src="static/img/unmute.svg" alt="Mute">
+        </button>
+        <p class="aviso text-center block top-0 text-gray-400">Devido ao tamanho da tela, use o teclado para digitar o Núemro</p>
     </div>
 
     <div id="call-status" style="display: none;">Status da Chamada: Desconhecido</div>
@@ -297,6 +346,7 @@
                 updateDescription(display.value);
             }
 
+
             function updateCallStatus() {
                 if (typeof webphone_api !== 'undefined') {
                     const isInCall = webphone_api.isincall();
@@ -391,24 +441,35 @@
                     }
                 });
 
+
+
                 window.addNumber = addNumber;
 
                 window.makeCall = function() {
-                    var number = display.value.replace(/\D/g, '');
-                    if (number) {
-                        webphone_api.call(number);
+                var number = display.value.replace(/\D/g, '');
+                if (number) {
+                    webphone_api.call(number);
+                    callStartTime = new Date(); // Inicia o timer
+                    startTimer(); // Inicia o temporizador para o tempo de chamada
+                    updateButtonState(true); // Atualiza o botão para "Desligar"
+                    // Armazena o número no display e evita que ele seja apagado
+                    display.setAttribute('data-number', display.value);
+                    display.disabled = true; // Desabilita o campo durante a chamada
+                } else {
+                    display.value = 'Digite um número';
+                    setTimeout(function() {
                         display.value = '';
-                    } else {
-                        display.value = 'Digite um número';
-                        setTimeout(function() {
-                            display.value = '';
-                        }, 1000);
-                    }
-                };
+                    }, 1000);
+                }
+            };
 
-                window.hangUp = function() {
-                    webphone_api.hangup();
-                };
+            window.hangUp = function() {
+                webphone_api.hangup();
+                stopTimer(); // Para o temporizador
+                display.disabled = false; // Habilita o campo novamente
+                display.value = display.getAttribute(''); // Restaura o número no display
+                updateButtonState(false); // Atualiza o botão para "Ligar"
+            };
 
                 // Inicia o polling para atualizar o status da chamada
                 setInterval(updateCallStatus, 200); // Atualiza o status a cada 200ms
@@ -434,6 +495,39 @@
         {
             webphone_api.accept();
         }
+
+        let isMuted = false;
+
+        function toggleMute() {
+            const direction = 2;
+            isMuted = !isMuted;
+
+            try {
+                webphone_api.mute(isMuted, direction);
+
+                // Atualiza o src da imagem no botão
+                const muteIcon = document.getElementById('mute-icon');
+                if (muteIcon) {
+                    muteIcon.src = isMuted ? 'static/img/mute.svg' : 'static/img/unmute.svg';
+                } else {
+                    console.error('Mute icon not found');
+                }
+            } catch (err) {
+                console.error('Failed to mute/unmute microphone:', err);
+            }
+        }
+
+        function setupMuteButton() {
+            const muteButton = document.getElementById('muteButton');
+            if (muteButton) {
+                muteButton.onclick = toggleMute;
+            } else {
+                console.error('Mute button not found');
+            }
+        }
+
+// Configura o botão quando o DOM estiver totalmente carregado
+document.addEventListener('DOMContentLoaded', setupMuteButton);
 
         function CallPopup(peername) {
     // Criação do container principal
