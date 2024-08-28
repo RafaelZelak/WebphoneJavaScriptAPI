@@ -4,7 +4,7 @@ import paramiko
 import re
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'  # Altere isso para uma chave secreta real
+app.secret_key = 'calvo'  # Altere isso para uma chave secreta real
 
 # Função de autenticação LDAP
 def authenticate(username, password):
