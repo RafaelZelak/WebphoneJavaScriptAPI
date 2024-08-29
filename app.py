@@ -99,6 +99,13 @@ def get_secret_for_phone_number(phone_number):
         # Fecha a conexão SSH, se estiver aberta
         client.close()
 
+@app.after_request
+def add_cache_control_headers(resp):
+    resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    resp.headers["Pragma"] = "no-cache"
+    resp.headers["Expires"] = "0"
+    return resp
+
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if 'logged_in' in session and session['logged_in']:
