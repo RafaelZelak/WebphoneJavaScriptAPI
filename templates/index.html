@@ -294,53 +294,45 @@
             const display = document.getElementById('display');
             const description = document.getElementById('description');
             const callStatus = document.getElementById('call-status');
-            const callButton = document.getElementById('call-button'); // Referência ao botão
-            const title = document.getElementById('title'); // Referência ao <h1>
+            const callButton = document.getElementById('call-button');
+            const title = document.getElementById('title');
 
-            let callStartTime = null;  // Armazena o horário de início da chamada
-            let timerInterval = null;  // Armazena o ID do intervalo para parar o contador
+            let callStartTime = null;
+            let timerInterval = null;
 
             let previousLength = 0;
 
         function formatNumber(number) {
-            // Se houver '*' ou '#', retorna o número sem modificação
             if (number.includes('*') || number.includes('#')) {
                 return number;
             }
 
-            // Remove tudo que não for número
             number = number.replace(/\D/g, '');
 
-            // Verifica o tamanho do número
             const currentLength = number.length;
 
-            // Se o número de dígitos for menor que 5, retorna sem formatação
             if (currentLength < 5) {
                 previousLength = currentLength;
                 return number;
             }
 
-            // Coloca o DDD após o quinto número
             if (currentLength >= 5 && currentLength <= 6) {
                 previousLength = currentLength;
                 return `(${number.slice(0, 2)}) ${number.slice(2)}`;
             }
 
-            // Se o número já tem 10 ou mais dígitos
             if (currentLength >= 10) {
                 const ddd = number.slice(0, 2);
                 const firstAfterDDD = number[2];
                 const isCellphone = firstAfterDDD >= 6 && firstAfterDDD <= 9;
                 const alreadyHasNine = number[2] === '9';
 
-                // Verifica se é um celular e se o '9' ainda não foi inserido
                 if (isCellphone && !alreadyHasNine && currentLength === 10) {
                     number = `${number.slice(0, 2)}9${number.slice(2)}`;
                 }
 
                 previousLength = currentLength;
 
-                // Retorna a formatação correta
                 if (number.length <= 10) {
                     return `(${ddd}) ${number.slice(2, 6)}-${number.slice(6)}`;
                 } else {
@@ -434,11 +426,11 @@
                 }
             }
             function makeCallHandler(event) {
-                event.preventDefault(); // Se necessário
-                const input = document.getElementById('display'); // Substitua pelo ID do seu input
+                event.preventDefault();
+                const input = document.getElementById('display');
                 const inputValue = input.value;
                 makeCall();
-                input.value = inputValue; // Restaurar o valor do input
+                input.value = inputValue;
             }
 
             function startTimer() {
@@ -483,7 +475,6 @@
 
             document.addEventListener('keydown', function(event) {
                 if (event.ctrlKey && event.key === 'v') {
-                    // Permite Ctrl + V
                     return;
                 }
 
@@ -515,42 +506,39 @@
                 window.addNumber = addNumber;
 
                 window.makeCall = function() {
-                    var rawNumber = display.value.replace(/\s/g, ''); // Remove espaços e outros caracteres
+                    var rawNumber = display.value.replace(/\s/g, '');
                     console.log("Número original:", rawNumber);
 
                     if (rawNumber.includes('*') || rawNumber.includes('#')) {
-                        // Se o número contém * ou #, não formata e faz a chamada diretamente
                         webphone_api.call(rawNumber);
-                        callStartTime = new Date(); // Inicia o timer
-                        startTimer(); // Inicia o temporizador para o tempo de chamada
-                        updateButtonState(true); // Atualiza o botão para "Desligar"
+                        callStartTime = new Date();
+                        startTimer();
+                        updateButtonState(true);
                         display.setAttribute('data-number', display.value);
-                        display.disabled = true; // Desabilita o campo durante a chamada
+                        display.disabled = true;
                         return;
                     }
 
-                    var cleanedNumber = rawNumber.replace(/\D/g, ''); // Remove caracteres não numéricos
+                    var cleanedNumber = rawNumber.replace(/\D/g, '');
 
                     if (cleanedNumber.length === 4) {
-                        // Aceita números com exatamente 4 dígitos como ramal
                         webphone_api.call(cleanedNumber);
-                        callStartTime = new Date(); // Inicia o timer
-                        startTimer(); // Inicia o temporizador para o tempo de chamada
-                        updateButtonState(true); // Atualiza o botão para "Desligar"
+                        callStartTime = new Date();
+                        startTimer();
+                        updateButtonState(true);
                         display.setAttribute('data-number', display.value);
-                        display.disabled = true; // Desabilita o campo durante a chamada
+                        display.disabled = true;
                         return;
                     }
 
                     if (cleanedNumber.length > 2) {
-                        var ddd = cleanedNumber.substring(0, 2); // Extrai o DDD
-                        var numberPart = cleanedNumber.substring(2); // Extrai a parte do número
+                        var ddd = cleanedNumber.substring(0, 2);
+                        var numberPart = cleanedNumber.substring(2);
 
                         var isMobile = (numberPart.length >= 8 && numberPart.charAt(0) >= '6' && numberPart.charAt(0) <= '9');
                         var isLandline = (numberPart.length >= 8 && numberPart.charAt(0) >= '0' && numberPart.charAt(0) <= '5');
 
                         if (isMobile) {
-                            // Se for celular com 10 dígitos, adiciona o 9 após o DDD
                             if (numberPart.length === 10) {
                                 numberPart = '9' + numberPart;
                             }
@@ -564,16 +552,15 @@
                             return;
                         }
 
-                        // Junta o DDD com o número validado
                         var number = ddd + '9' + numberPart;
 
                         if (number) {
                             webphone_api.call(number);
-                            callStartTime = new Date(); // Inicia o timer
-                            startTimer(); // Inicia o temporizador para o tempo de chamada
-                            updateButtonState(true); // Atualiza o botão para "Desligar"
+                            callStartTime = new Date();
+                            startTimer();
+                            updateButtonState(true);
                             display.setAttribute('data-number', display.value);
-                            display.disabled = true; // Desabilita o campo durante a chamada
+                            display.disabled = true;
                         } else {
                             display.value = 'Digite um número';
                             setTimeout(function() {
@@ -594,20 +581,18 @@
 
             window.hangUp = function() {
                 webphone_api.hangup();
-                stopTimer(); // Para o temporizador
-                display.disabled = false; // Habilita o campo novamente
-                display.value = display.getAttribute(''); // Restaura o número no display
-                updateButtonState(false); // Atualiza o botão para "Ligar"
+                stopTimer();
+                display.disabled = false;
+                display.value = display.getAttribute('');
+                updateButtonState(false);
             };
 
-                // Inicia o polling para atualizar o status da chamada
-                setInterval(updateCallStatus, 200); // Atualiza o status a cada 200ms
+                setInterval(updateCallStatus, 200);
 
-                // Novo código inserido
                 webphone_api.onCallStateChange(function (status, direction, peername, peerdisplayname, line) {
                     if (status === 'setup') {
                         if (direction === 2) {
-                            CallPopup(peername); // Passa o peername como argumento
+                            CallPopup(peername);
                         }
                     }
                 });
@@ -626,7 +611,6 @@
         }
 
         function handleCdr(caller, called, connectTime, duration, direction, peerDisplayName, reason, line, callId) {
-            // Cria um objeto com os detalhes da chamada
             const callDetails = {
                 caller: caller,
                 called: called,
@@ -639,11 +623,10 @@
                 callId: callId
             };
 
-            const input = document.getElementById('display'); // Obtém o elemento de entrada
+            const input = document.getElementById('display');
             input.value = '';
         }
 
-        // Configura o callback para o evento onCdr
         webphone_api.onCdr(handleCdr);
 
         let isMuted = false;
@@ -655,7 +638,6 @@
             try {
                 webphone_api.mute(isMuted, direction);
 
-                // Atualiza o src da imagem no botão
                 const muteIcon = document.getElementById('mute-icon');
                 if (muteIcon) {
                     muteIcon.src = isMuted ? 'static/img/mute.svg' : 'static/img/unmute.svg';
@@ -678,32 +660,27 @@
 
 
 
-// Configura o botão quando o DOM estiver totalmente carregado
         document.addEventListener('DOMContentLoaded', setupMuteButton);
 
         function CallPopup(peername) {
-            // Criação do container principal
             const popupContainer = document.createElement('div');
             popupContainer.className = 'fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50';
 
-            // Criação do conteúdo do popup
             const popupContent = document.createElement('div');
-            popupContent.style.backgroundColor = '#111826'; // Define a cor de fundo diretamente
-            popupContent.style.width = '400px'; // Define a largura desejada
-            popupContent.style.height = '150px'; // Define a altura desejada
-            popupContent.className = 'rounded-lg shadow-lg p-6'; // Remove a classe de tamanho máximo
+            popupContent.style.backgroundColor = '#111826';
+            popupContent.style.width = '400px';
+            popupContent.style.height = '150px';
+            popupContent.className = 'rounded-lg shadow-lg p-6';
 
-            // Texto de aviso ou título
             const popupText = document.createElement('p');
             popupText.className = 'text-xl font-semibold text-white mb-4 text-center';
-            popupText.innerText = `Recebendo Chamada de ${peername}!`; // Exibe o peername
+            popupText.innerText = `Recebendo Chamada de ${peername}!`;
 
-            // Botões de ação
             const buttonContainer = document.createElement('div');
-            buttonContainer.className = 'flex justify-around'; // Ajusta o espaçamento entre os botões
+            buttonContainer.className = 'flex justify-around';
 
             const hangupButton = document.createElement('button');
-            hangupButton.className = 'bg-red-500 hover:bg-red-600 text-white font-bold py-7 px-14 rounded'; // Aumenta o tamanho dos botões
+            hangupButton.className = 'bg-red-500 hover:bg-red-600 text-white font-bold py-7 px-14 rounded';
             hangupButton.innerText = 'Recusar';
             hangupButton.onclick = function() {
                 webphone_api.hangup();
@@ -718,45 +695,32 @@
                 document.body.removeChild(popupContainer);
             };
 
-            // Adicionando botões ao container
             buttonContainer.appendChild(hangupButton);
             buttonContainer.appendChild(acceptButton);
 
-            // Adicionando conteúdo ao popup
             popupContent.appendChild(popupText);
             popupContent.appendChild(buttonContainer);
 
-            // Adicionando o popup ao container principal
             popupContainer.appendChild(popupContent);
 
-            // Adicionando o popup ao body
             document.body.appendChild(popupContainer);
         }
 
         async function checkCallStatus() {
             while (true) {
-                // Aguarda 30 minutos
                 await new Promise(resolve => setTimeout(resolve, 30 * 60 * 1000));
 
-                // Verifica o status da chamada
                 if (!webphone_api.isincall()) {
-                    // Recarrega a página se não houver chamada
                     location.reload();
                     return;
                 } else {
-                    // Enquanto ainda estiver em chamada, verifica a cada 5 segundos
                     while (webphone_api.isincall()) {
                         await new Promise(resolve => setTimeout(resolve, 5000));
                     }
-
-                    // Recarrega a página quando a chamada terminar
                     location.reload();
                 }
             }
         }
-
-        // Inicia a função
         checkCallStatus();
         </script>
-
 </body>
