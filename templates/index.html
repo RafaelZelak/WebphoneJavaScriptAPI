@@ -539,7 +539,7 @@
                         var isLandline = (numberPart.length >= 8 && numberPart.charAt(0) >= '0' && numberPart.charAt(0) <= '5');
 
                         if (isMobile) {
-                            if (numberPart.length === 10) {
+                            if (numberPart.length === 8) {
                                 numberPart = '9' + numberPart;
                             }
                         } else if (isLandline) {
@@ -552,7 +552,7 @@
                             return;
                         }
 
-                        var number = ddd + '9' + numberPart;
+                        var number = ddd + numberPart;
 
                         if (number) {
                             webphone_api.call(number);
