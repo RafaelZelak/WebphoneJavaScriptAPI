@@ -1,17 +1,1 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-<svg width="800px" height="800px" viewBox="-5 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
-
-    <title>microphone</title>
-    <desc>Created with Sketch Beta.</desc>
-    <defs>
-
-</defs>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
-        <g id="Icon-Set-Filled" sketch:type="MSLayerGroup" transform="translate(-107.000000, -309.000000)" fill="#000000">
-            <path d="M118,333 C121.866,333 125,329.866 125,326 L125,316 C125,312.134 121.866,309 118,309 C114.134,309 111,312.134 111,316 L111,326 C111,329.866 114.134,333 118,333 L118,333 Z M129,328 L127,328 C126.089,332.007 122.282,335 118,335 C113.718,335 109.911,332.007 109,328 L107,328 C107.883,332.799 112.063,336.51 117,336.955 L117,339 L116,339 C115.448,339 115,339.448 115,340 C115,340.553 115.448,341 116,341 L120,341 C120.552,341 121,340.553 121,340 C121,339.448 120.552,339 120,339 L119,339 L119,336.955 C123.937,336.51 128.117,332.799 129,328 L129,328 Z" id="microphone" sketch:type="MSShapeGroup">
-
-</path>
-        </g>
-    </g>
-</svg>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="800px" height="800px" viewBox="0,0,256,256"><g fill="#ffffff" fill-rule="evenodd" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="translate(40,0) scale(8,8)"><g id="Page-1"><g transform="translate(-107,-309)" id="Icon-Set-Filled"><path d="M118,333c3.866,0 7,-3.134 7,-7v-10c0,-3.866 -3.134,-7 -7,-7c-3.866,0 -7,3.134 -7,7v10c0,3.866 3.134,7 7,7zM129,328h-2c-0.911,4.007 -4.718,7 -9,7c-4.282,0 -8.089,-2.993 -9,-7h-2c0.883,4.799 5.063,8.51 10,8.955v2.045h-1c-0.552,0 -1,0.448 -1,1c0,0.553 0.448,1 1,1h4c0.552,0 1,-0.447 1,-1c0,-0.552 -0.448,-1 -1,-1h-1v-2.045c4.937,-0.445 9.117,-4.156 10,-8.955z" id="microphone"></path></g></g></g></g></svg>

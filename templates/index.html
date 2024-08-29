@@ -9,6 +9,33 @@
     <script src="{{ url_for('static', filename='webphone_config.js') }}"></script>
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <style>
+        .pico-close{
+            display: none;
+        }
+        .pico-overlay{
+            display: none !important;
+        }
+        .pico-content{
+            display: none !important;
+        }
+        #ce_modal_content{
+            display: none !important;
+        }
+        #ce_modal_content_inner{
+            display: none !important;
+        }
+        #ce_modal{
+            display: none !important;
+        }
+        #ce_modal_header{
+            display: none !important;
+        }
+        #ce_modal_content{
+            display: none !important;
+        }
+        #ce_modal_footer{
+            display: none !important;
+        }
         .inputPhone {
             background-color: transparent;
             border: none;
@@ -99,10 +126,10 @@
         }
 
         .NameRamal{
-            margin-top: -23px;
+            margin-top: -24px;
             margin-bottom: 20px;
             color: #6a7a8f;
-            font-size: 11pt;
+            font-size: 12pt;
         }
 
         .exit{
@@ -110,7 +137,7 @@
             margin-left: 93%;
             margin-top: -10px;
             transition: .3s;
-            font-size: 13pt;
+            font-size: 12pt;
             z-index: 10 !important;
         }
 
@@ -198,7 +225,7 @@
             height: 30px;
             position: absolute;
             margin-left: -30px;
-            margin-top: -55px;
+            margin-top: -5px;
         }
     </style>
 </head>
@@ -270,24 +297,58 @@
             let callStartTime = null;  // Armazena o horário de início da chamada
             let timerInterval = null;  // Armazena o ID do intervalo para parar o contador
 
-            function formatNumber(number) {
-                if (number.includes('*') || number.includes('#')) {
-                    return number;
-                }
-                number = number.replace(/\D/g, '');
+            let previousLength = 0;
 
-                if (number.length === 0) {
-                    return '';
-                } else if (number.length <= 2) {
-                    return `(${number}`;
-                } else if (number.length <= 6) {
-                    return `(${number.slice(0, 2)}) ${number.slice(2)}`;
-                } else if (number.length <= 10) {
-                    return `(${number.slice(0, 2)}) ${number.slice(2, 7)}-${number.slice(7)}`;
+        function formatNumber(number) {
+            // Se houver '*' ou '#', retorna o número sem modificação
+            if (number.includes('*') || number.includes('#')) {
+                return number;
+            }
+
+            // Remove tudo que não for número
+            number = number.replace(/\D/g, '');
+
+            // Verifica o tamanho do número
+            const currentLength = number.length;
+
+            // Se o número de dígitos for menor que 5, retorna sem formatação
+            if (currentLength < 5) {
+                previousLength = currentLength;
+                return number;
+            }
+
+            // Coloca o DDD após o quinto número
+            if (currentLength >= 5 && currentLength <= 6) {
+                previousLength = currentLength;
+                return `(${number.slice(0, 2)}) ${number.slice(2)}`;
+            }
+
+            // Se o número já tem 10 ou mais dígitos
+            if (currentLength >= 10) {
+                const ddd = number.slice(0, 2);
+                const firstAfterDDD = number[2];
+                const isCellphone = firstAfterDDD >= 6 && firstAfterDDD <= 9;
+                const alreadyHasNine = number[2] === '9';
+
+                // Verifica se é um celular e se o '9' ainda não foi inserido
+                if (isCellphone && !alreadyHasNine && currentLength === 10) {
+                    number = `${number.slice(0, 2)}9${number.slice(2)}`;
+                }
+
+                previousLength = currentLength;
+
+                // Retorna a formatação correta
+                if (number.length <= 10) {
+                    return `(${ddd}) ${number.slice(2, 6)}-${number.slice(6)}`;
                 } else {
-                    return `(${number.slice(0, 2)}) ${number.slice(2, 7)}-${number.slice(7, 11)} ${number.slice(11)}`;
+                    return `(${ddd}) ${number.slice(2, 7)}-${number.slice(7)}`;
                 }
             }
+
+            previousLength = currentLength;
+            return `(${number.slice(0, 2)}) ${number.slice(2, 7)}-${number.slice(7)}`;
+        }
+
 
             function updateDescription(number) {
                 number = number.replace(/\D/g, '');
@@ -418,6 +479,11 @@
             display.addEventListener('input', handleInput);
 
             document.addEventListener('keydown', function(event) {
+                if (event.ctrlKey && event.key === 'v') {
+                    // Permite Ctrl + V
+                    return;
+                }
+
                 if (event.key >= '0' && event.key <= '9') {
                     event.preventDefault();
                     addNumber(event.key);
@@ -446,22 +512,82 @@
                 window.addNumber = addNumber;
 
                 window.makeCall = function() {
-                var number = display.value.replace(/\D/g, '');
-                if (number) {
-                    webphone_api.call(number);
-                    callStartTime = new Date(); // Inicia o timer
-                    startTimer(); // Inicia o temporizador para o tempo de chamada
-                    updateButtonState(true); // Atualiza o botão para "Desligar"
-                    // Armazena o número no display e evita que ele seja apagado
-                    display.setAttribute('data-number', display.value);
-                    display.disabled = true; // Desabilita o campo durante a chamada
-                } else {
-                    display.value = 'Digite um número';
-                    setTimeout(function() {
-                        display.value = '';
-                    }, 1000);
-                }
-            };
+                    var rawNumber = display.value.replace(/\s/g, ''); // Remove espaços e outros caracteres
+                    console.log("Número original:", rawNumber);
+
+                    if (rawNumber.includes('*') || rawNumber.includes('#')) {
+                        // Se o número contém * ou #, não formata e faz a chamada diretamente
+                        webphone_api.call(rawNumber);
+                        callStartTime = new Date(); // Inicia o timer
+                        startTimer(); // Inicia o temporizador para o tempo de chamada
+                        updateButtonState(true); // Atualiza o botão para "Desligar"
+                        display.setAttribute('data-number', display.value);
+                        display.disabled = true; // Desabilita o campo durante a chamada
+                        return;
+                    }
+
+                    var cleanedNumber = rawNumber.replace(/\D/g, ''); // Remove caracteres não numéricos
+
+                    if (cleanedNumber.length === 4) {
+                        // Aceita números com exatamente 4 dígitos como ramal
+                        webphone_api.call(cleanedNumber);
+                        callStartTime = new Date(); // Inicia o timer
+                        startTimer(); // Inicia o temporizador para o tempo de chamada
+                        updateButtonState(true); // Atualiza o botão para "Desligar"
+                        display.setAttribute('data-number', display.value);
+                        display.disabled = true; // Desabilita o campo durante a chamada
+                        return;
+                    }
+
+                    if (cleanedNumber.length > 2) {
+                        var ddd = cleanedNumber.substring(0, 2); // Extrai o DDD
+                        var numberPart = cleanedNumber.substring(2); // Extrai a parte do número
+
+                        var isMobile = (numberPart.length >= 8 && numberPart.charAt(0) >= '6' && numberPart.charAt(0) <= '9');
+                        var isLandline = (numberPart.length >= 8 && numberPart.charAt(0) >= '0' && numberPart.charAt(0) <= '5');
+
+                        if (isMobile) {
+                            // Se for celular com 10 dígitos, adiciona o 9 após o DDD
+                            if (numberPart.length === 10) {
+                                numberPart = '9' + numberPart;
+                            }
+                        } else if (isLandline) {
+                        } else {
+                            console.log("Número inválido");
+                            display.value = 'Número inválido';
+                            setTimeout(function() {
+                                display.value = '';
+                            }, 1000);
+                            return;
+                        }
+
+                        // Junta o DDD com o número validado
+                        var number = ddd + '9' + numberPart;
+
+                        if (number) {
+                            webphone_api.call(number);
+                            callStartTime = new Date(); // Inicia o timer
+                            startTimer(); // Inicia o temporizador para o tempo de chamada
+                            updateButtonState(true); // Atualiza o botão para "Desligar"
+                            display.setAttribute('data-number', display.value);
+                            display.disabled = true; // Desabilita o campo durante a chamada
+                        } else {
+                            display.value = 'Digite um número';
+                            setTimeout(function() {
+                                display.value = '';
+                            }, 1000);
+                        }
+                    } else {
+                        console.log("Número inválido");
+                        display.value = 'Número inválido';
+                        setTimeout(function() {
+                            display.value = '';
+                        }, 1000);
+                    }
+                };
+
+
+
 
             window.hangUp = function() {
                 webphone_api.hangup();
@@ -496,6 +622,27 @@
             webphone_api.accept();
         }
 
+        function handleCdr(caller, called, connectTime, duration, direction, peerDisplayName, reason, line, callId) {
+            // Cria um objeto com os detalhes da chamada
+            const callDetails = {
+                caller: caller,
+                called: called,
+                connectTime: connectTime,
+                duration: duration,
+                direction: direction,
+                peerDisplayName: peerDisplayName,
+                reason: reason,
+                line: line,
+                callId: callId
+            };
+
+            const input = document.getElementById('display'); // Obtém o elemento de entrada
+            input.value = '';
+        }
+
+        // Configura o callback para o evento onCdr
+        webphone_api.onCdr(handleCdr);
+
         let isMuted = false;
 
         function toggleMute() {
@@ -526,62 +673,87 @@
             }
         }
 
+
+
 // Configura o botão quando o DOM estiver totalmente carregado
-document.addEventListener('DOMContentLoaded', setupMuteButton);
+        document.addEventListener('DOMContentLoaded', setupMuteButton);
 
         function CallPopup(peername) {
-    // Criação do container principal
-    const popupContainer = document.createElement('div');
-    popupContainer.className = 'fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50';
+            // Criação do container principal
+            const popupContainer = document.createElement('div');
+            popupContainer.className = 'fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50';
 
-    // Criação do conteúdo do popup
-    const popupContent = document.createElement('div');
-    popupContent.style.backgroundColor = '#111826'; // Define a cor de fundo diretamente
-    popupContent.style.width = '400px'; // Define a largura desejada
-    popupContent.style.height = '150px'; // Define a altura desejada
-    popupContent.className = 'rounded-lg shadow-lg p-6'; // Remove a classe de tamanho máximo
+            // Criação do conteúdo do popup
+            const popupContent = document.createElement('div');
+            popupContent.style.backgroundColor = '#111826'; // Define a cor de fundo diretamente
+            popupContent.style.width = '400px'; // Define a largura desejada
+            popupContent.style.height = '150px'; // Define a altura desejada
+            popupContent.className = 'rounded-lg shadow-lg p-6'; // Remove a classe de tamanho máximo
 
-    // Texto de aviso ou título
-    const popupText = document.createElement('p');
-    popupText.className = 'text-xl font-semibold text-white mb-4 text-center';
-    popupText.innerText = `Recebendo Chamada de ${peername}!`; // Exibe o peername
+            // Texto de aviso ou título
+            const popupText = document.createElement('p');
+            popupText.className = 'text-xl font-semibold text-white mb-4 text-center';
+            popupText.innerText = `Recebendo Chamada de ${peername}!`; // Exibe o peername
 
-    // Botões de ação
-    const buttonContainer = document.createElement('div');
-    buttonContainer.className = 'flex justify-around'; // Ajusta o espaçamento entre os botões
+            // Botões de ação
+            const buttonContainer = document.createElement('div');
+            buttonContainer.className = 'flex justify-around'; // Ajusta o espaçamento entre os botões
 
-    const hangupButton = document.createElement('button');
-    hangupButton.className = 'bg-red-500 hover:bg-red-600 text-white font-bold py-7 px-14 rounded'; // Aumenta o tamanho dos botões
-    hangupButton.innerText = 'Recusar';
-    hangupButton.onclick = function() {
-        webphone_api.hangup();
-        document.body.removeChild(popupContainer);
-    };
+            const hangupButton = document.createElement('button');
+            hangupButton.className = 'bg-red-500 hover:bg-red-600 text-white font-bold py-7 px-14 rounded'; // Aumenta o tamanho dos botões
+            hangupButton.innerText = 'Recusar';
+            hangupButton.onclick = function() {
+                webphone_api.hangup();
+                document.body.removeChild(popupContainer);
+            };
 
-    const acceptButton = document.createElement('button');
-    acceptButton.className = 'bg-green-500 hover:bg-green-600 text-white font-bold px-14 rounded'; // Aumenta o tamanho dos botões
-    acceptButton.innerText = 'Aceitar';
-    acceptButton.onclick = function() {
-        webphone_api.accept();
-        document.body.removeChild(popupContainer);
-    };
+            const acceptButton = document.createElement('button');
+            acceptButton.className = 'bg-green-500 hover:bg-green-600 text-white font-bold px-14 rounded'; // Aumenta o tamanho dos botões
+            acceptButton.innerText = 'Aceitar';
+            acceptButton.onclick = function() {
+                webphone_api.accept();
+                document.body.removeChild(popupContainer);
+            };
 
-    // Adicionando botões ao container
-    buttonContainer.appendChild(hangupButton);
-    buttonContainer.appendChild(acceptButton);
+            // Adicionando botões ao container
+            buttonContainer.appendChild(hangupButton);
+            buttonContainer.appendChild(acceptButton);
 
-    // Adicionando conteúdo ao popup
-    popupContent.appendChild(popupText);
-    popupContent.appendChild(buttonContainer);
+            // Adicionando conteúdo ao popup
+            popupContent.appendChild(popupText);
+            popupContent.appendChild(buttonContainer);
 
-    // Adicionando o popup ao container principal
-    popupContainer.appendChild(popupContent);
+            // Adicionando o popup ao container principal
+            popupContainer.appendChild(popupContent);
 
-    // Adicionando o popup ao body
-    document.body.appendChild(popupContainer);
-}
+            // Adicionando o popup ao body
+            document.body.appendChild(popupContainer);
+        }
 
+        async function checkCallStatus() {
+            while (true) {
+                // Aguarda 30 minutos
+                await new Promise(resolve => setTimeout(resolve, 30 * 60 * 1000));
 
+                // Verifica o status da chamada
+                if (!webphone_api.isincall()) {
+                    // Recarrega a página se não houver chamada
+                    location.reload();
+                    return;
+                } else {
+                    // Enquanto ainda estiver em chamada, verifica a cada 5 segundos
+                    while (webphone_api.isincall()) {
+                        await new Promise(resolve => setTimeout(resolve, 5000));
+                    }
+
+                    // Recarrega a página quando a chamada terminar
+                    location.reload();
+                }
+            }
+        }
+
+        // Inicia a função
+        checkCallStatus();
         </script>
 
 </body>
