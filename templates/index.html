@@ -405,20 +405,16 @@
 
 
             (function() {
-                // Definindo a função no escopo global
                 window.updateCallStatus = function() {
                     if (typeof webphone_api !== 'undefined') {
                         const isInCall = webphone_api.isincall();
 
                         if (!isInCall && callStartTime) {
-                            // Se não estiver em chamada e o timer estiver em andamento, pare o timer
                             callStartTime = null;
                             stopTimer();
                         }
 
-                        // Atualiza o status da chamada e o título da página
                         if (isInCall) {
-                            // Somente atualiza o título se o timer estiver ativo
                             if (callStartTime) {
                                 callStatus.innerText = `Status da Chamada: Em Chamada - ${formatTime(getElapsedTime())}`;
                                 title.innerText = `Em Chamada - ${formatTime(getElapsedTime())}`;
@@ -430,7 +426,6 @@
                             title.innerText = 'Softphone Setup';
                         }
 
-                        // Atualiza o estado dos botões de chamada
                         updateButtonState(isInCall);
                     }
                 };
@@ -442,7 +437,6 @@
                     const regex = /NOTIFICATION,PRESENCE,\d+,Open,Speaking$/;
 
                     if (regex.test(message.trim())) {
-                        // Trigger: A chamada foi iniciada, inicie o timer
                         handleNotificationPresence();
                     }
 
@@ -450,7 +444,6 @@
                 };
 
                 function handleNotificationPresence() {
-                    // Atualiza o status da chamada e inicia o timer
                     console.log('Trigger acionado: NOTIFICATION,PRESENCE,Open,Speaking detectado');
                     if (!callStartTime) {
                         callStartTime = new Date();
@@ -458,9 +451,8 @@
                     }
                 }
 
-                // Certifique-se de que o código a seguir esteja no escopo global
                 window.onload = function() {
-                    updateCallStatus(); // Chama updateCallStatus na inicialização
+                    updateCallStatus();
                 };
 
             })();
