@@ -8,7 +8,7 @@ var webphone_api = (function ()
 {
     /**
      * API parameter configuration have been moved to: webphone_config.js.
-	 * (If you set any parameters here, those will be still loaded)	
+	 * (If you set any parameters here, those will be still loaded)
      */
     var parameters = {};
 
@@ -43,7 +43,7 @@ function onRegStateChange(callback)
 }
 
 
-/** Call this function once, passing a callback. 
+/** Call this function once, passing a callback.
  * The passed callback function will be called on every call state change.
  * --PARAMETERS --
  * event: can have following values: callSetup, callRinging, callConnected, callDisconnected
@@ -109,7 +109,7 @@ function onCdr(callback)
  * --PARAMETER --
  * dtmf: string DTMF character
  * line: the DTMF refers to this line */
-function onDTMF(callback) 
+function onDTMF(callback)
 {
     if(callback === null) { webphone_api.cddtmf = []; return; }
     if ( !callback || typeof (callback) !== 'function' ) { return; }
@@ -117,9 +117,9 @@ function onDTMF(callback)
 }
 
 /**
-* Optionally you can "start" the phone, before making any other action. 
+* Optionally you can "start" the phone, before making any other action.
 * In some circumstances the initialization procedure might take a few seconds (depending on usable engines) so you can prepare the webphone with this method
-* to avoid any delay when the user really needs to use by pressing the call button for example. 
+* to avoid any delay when the user really needs to use by pressing the call button for example.
 * If the serveraddress/username/password is already set and auto register is not disabled, then the webphone will also register (connect) to the SIP server upon start.
 * If start is not called, then the webphone will initialize itself the first time when you call some other function such as register or call.
 * The webphone parameter should be set before you call this method (preset in the js file or by using the setparameter function).
@@ -343,7 +343,7 @@ function getavailablecallfunc ()
     }
 }
 
-/** 
+/**
 * Forward incoming call to number
 */
 function forward (number)
@@ -357,7 +357,7 @@ function forward (number)
         webphone_api.plhandler.Forward(number);
 }
 
-/** 
+/**
 * Add people to conference.
 * If number is empty than will mix the currently running calls (if there is more than one call)
 * Otherwise it will call the new number (usually a phone number or a SIP user name) and once connected will join with the current session.
@@ -375,7 +375,7 @@ function conference (number, add)
         webphone_api.plhandler.Conference(number, add);
 }
 
-/** 
+/**
 * Transfer current call to number which is usually a phone number or a SIP username. (Will use the REFER method after SIP standards).
 * You can set the mode of the transfer with the "transfertype" parameter.
 */
@@ -390,7 +390,7 @@ function transfer (number)
         webphone_api.plhandler.Transfer(number);
 }
 
-/** 
+/**
 * Send DTMF message by SIP INFO or RFC2833 method (depending on the "dtmfmode" parameter).
 * Please note that the "msg" parameter is a string. This means that multiple dtmf characters can be passed at once
 * and the webphone will streamline them properly. Use the space character to insert delays between the digits.
@@ -405,7 +405,7 @@ function dtmf (msg)
         webphone_api.plhandler.Dtmf(msg);
 }
 
-/** 
+/**
 *  Mute current call. The direction can have the following values:
 *   0:  state both
 *   1:  state out (speakers)
@@ -428,7 +428,7 @@ function ismuted ()
         return false;
 }
 
-/** 
+/**
 * Set state to "true" to put the calll on hold
 * or "false" to unhold the call
 */
@@ -449,7 +449,7 @@ function isonhold ()
         return false;
 }
 
-/** 
+/**
 * Send a chat message. (SIP MESSAGE method after RFC 3428)
  * --PARAMETERS --
  * number: String -  can be a phone number or SIP username/extension number.
@@ -467,7 +467,7 @@ function sendchat (number, msg, group)
         webphone_api.plhandler.SendChat(number, msg, group);
 }
 
-/** 
+/**
 * Send a SMS message.
 * Number can be a PSTN or mobile phone number.
 * from is optional
@@ -551,7 +551,7 @@ function setdevice (dev, devicename, immediate, fromcode)
     }
 }
 
-/** 
+/**
 * Set volume (0-100%) for the selected device. Default value is 50% -> means no change
 * The dev parameter can have the following values:
 *  0 for the recording (microphone) audio device
@@ -653,7 +653,7 @@ function getcontact(name ,number)
 /** This function will return a String containing the whole contact list. If there are no contacts, it will return null.
 Set the all parameter to true to receive also virtual contacts as well, like voicemail number, etc...
 Contacts will be separated by "carriage return new line": \r\n
-           Contact fields will be separated by "tabs": \t 
+           Contact fields will be separated by "tabs": \t
            A contact can have more than one phone numbers or SIP URIs, so these will be separated by Pipe(Vertical bar): |
            See example below:
 The order of fields and their meaning:
@@ -689,8 +689,8 @@ function synccontacts()
 
 /** This function will return a String containing the whole call history list. If there are no entries in call history, it will return null.
 Call history entries will be separated by "carriage return new line": \r\n
-           Call history fields will be separated by "tabs": \t 
-           
+           Call history fields will be separated by "tabs": \t
+
 The order of fields and their meaning:
 type: int - 0=Outgoing call, 1=Incoming call, 2=Missed call
 name: String - can be a name, can be the same as the number or can be empty String
@@ -720,7 +720,7 @@ function setparameter (param, value, allowempty)
             value = 'NULL';
         }
     }
-    
+
     if (typeof (webphone_api.plhandler) === 'undefined' || webphone_api.plhandler === null)
     {
         webphone_api.Log2('WARNING, webphone not initialized yet. webphone_api.setparameter AddToQueue: ' + param + ': ' + value);
@@ -738,9 +738,9 @@ function setparameter (param, value, allowempty)
 function getparameter (param)  // string
 {
     if (typeof (param) === 'undefined' || param === null) { return ''; }
-    
+
     var value = parameters[param];
-    
+
     if (typeof (webphone_api.plhandler) !== 'undefined' && webphone_api.plhandler !== null)
     {
         return webphone_api.plhandler.GetParameter(param);
@@ -753,9 +753,9 @@ function getparameter (param)  // string
             else if (typeof (console.log) !== 'undefined' && console.log !== null) { console.log(err_msg); }
         }
     }
-    
+
     if (typeof (value) === 'undefined' || value === null) { return ''; }
-    
+
     return value;
 }
 
@@ -842,7 +842,7 @@ function unregister ()
         webphone_api.plhandler.Unregister();
 }
 
-/** 
+/**
 * Will receive presence information as events: PRESENCE, status,username,displayname,email (displayname and email can be empty)
 *       To receive events use the "onEvent(callback)" API function
 * userlist: list of sip account usernames separated by comma
@@ -1033,7 +1033,7 @@ function jvoip(name, jargs)
         webphone_api.Log('ERROR, webphone_api: jvoip webphone_api.plhandler is not defined');
 }
 
-/** 
+/**
 * New function to replace onDisplay, onLog, onEvents
 * Call this function once and pass a callback, to receive important events, which should be displayed for the user and/or parsed to perform other actions after your software custom logic. You will also receive all log messages depending on the value of "loglevel" parameter.
 * For the included softphone these are already handled, so no need to use this, except if you need some extra custom actions or functionality which depends on the notifications.
@@ -1043,35 +1043,35 @@ function jvoip(name, jargs)
 					Example: STATUS,1,Ringing,2222,1111,2,Katie,[callid]
 					Instead of parsing these low level string notifications, you should use the callback functions instead such as onAppStateChange, onCallStateChange, onChat and the other onXXX functions.
 					See the "Notifications" section in the documentation for the possible strings.
-            "log" - log messages 
+            "log" - log messages
 					Usually you don't need to check for the logs.
 					You might watch for this only if you wish to collect the logs for some purpose or you have to watch for a log string to be triggered.
             "display" - important messages to be displayed for the user. If you wish to handle the popups yourself, then disable popups by settings "showtoasts" parameter to "false". From here on you will be responsible for presenting these messages to the user.
-                        If type is "display", then the "message" parameter will be composed of a "title" until the first comma and a "text". 
+                        If type is "display", then the "message" parameter will be composed of a "title" until the first comma and a "text".
 						The title can be an empty string, in which case the message begins with a comma.
 
 * message: the text of the event/log/display
 */
 /*
-	Example: 
+	Example:
 		webphone_api.onEvent( function (type, message)
 		{
-			// For example the following status means that there is an incoming call ringing from 2222 on the first line: 
-			// STATUS,1,Ringing,2222,1111,2,Katie,[callid]					
+			// For example the following status means that there is an incoming call ringing from 2222 on the first line:
+			// STATUS,1,Ringing,2222,1111,2,Katie,[callid]
 			// You can find more detailed explanation about events in the documentation "Notifications" section.
-			
+
 			// example for detecting incoming call:
 			if (type === 'event')
 			{
-				var evtarray = message.split(','); //parameters are separated by comma (,)			
-				
+				var evtarray = message.split(','); //parameters are separated by comma (,)
+
 				if (evtarray[0] === 'STATUS' && evtarray[2] === 'Ringing')
 				{
 					if (evtarray[5] === '1') // 1 means it is an outgoing call
 					{
-						//add any custom logic here, for example you might lookup the caller from a database	
+						//add any custom logic here, for example you might lookup the caller from a database
 						alert('Incoming call from: '+evtarray[3] + ' ' + evtarray[6]); //of course, instead of alert you should use some better html display
-					}					
+					}
 				}
 			}
 
@@ -1080,7 +1080,7 @@ function jvoip(name, jargs)
 			{
 				var position = message.indexOf(',');
 				var title = message.substring(0, position); // NOTE: title can be empty string
-				var text = message.substring(position + 1);				
+				var text = message.substring(position + 1);
 				alert(title+'\r\n'+text); //of course, instead of alert you should use some better html display
 
 				//NOTE: If you wish to handle the popups yourself, then disable popups by settings "showtoasts" parameter to "false".
@@ -1095,9 +1095,9 @@ function onEvent (callback)
 }
 
 
-/** Returns the current global status ("best" line status). 
+/** Returns the current global status ("best" line status).
  * The possible returned texts are the same like for notifications: getEvenets
- * This is NOT a callback, you have to call it every time you want to receive the status. 
+ * This is NOT a callback, you have to call it every time you want to receive the status.
  */
 function getStatus ()  // string
 {
@@ -1276,7 +1276,7 @@ function LoadScriptFile (url, callback, errorcallback) // used instead of docume
                 }
             };
         }else //Other browsers
-        {  
+        {
             script.onload = function()
             {
                 //Log('EVENT, LoadScriptFile: loaded file: ' + url);
@@ -1432,7 +1432,7 @@ var wphone = {
     isregistered: isregistered,
     isincall: isincall,
     unregister: unregister,
-    
+
     setline: setline,
     getline: getline,
     linetocallid: linetocallid,

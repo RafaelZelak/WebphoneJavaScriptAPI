@@ -25,7 +25,7 @@
         <h1 id="title" class="text-2xl font-semibold mb-4 text-center text-white">Softphone Setup</h1>
 
         <div class="mb-4 number">
-            <input id="display" type="text" class="w-full border border-gray-700 rounded-lg p-4 text-center bg-gray-900 text-white focus:outline-none display-input inputPhone" maxlength="15">
+            <input oninput="handleInput(this)" id="display" type="text" class="w-full border border-gray-700 rounded-lg p-4 text-center bg-gray-900 text-white focus:outline-none display-input inputPhone" maxlength="15">
             <p id="description" class="text-center text-white mt-2 sufix">Sem Formato</p>
         </div>
 
@@ -105,6 +105,7 @@
         }
     </script>
     <script>
+        console.log = function() {};
         window.onload = function() {
             const display = document.getElementById('display');
             const description = document.getElementById('description');
@@ -117,46 +118,25 @@
 
             let previousLength = 0;
 
-        function formatNumber(number) {
-            if (number.includes('*') || number.includes('#')) {
-                return number;
+            function formatNumber(number) {
+            // Remove caracteres não numéricos
+            let cleanedNumber = number.replace(/\D/g, '');
+
+            // Formata o número com base no comprimento
+            if (cleanedNumber.length <= 2) {
+                return cleanedNumber;
+            } else if (cleanedNumber.length <= 6) {
+                return `(${cleanedNumber.slice(0, 2)}) ${cleanedNumber.slice(2)}`;
+            } else if (cleanedNumber.length <= 10) {
+                return `(${cleanedNumber.slice(0, 2)}) ${cleanedNumber.slice(2, 6)}-${cleanedNumber.slice(6)}`;
+            } else {
+                return `(${cleanedNumber.slice(0, 2)}) ${cleanedNumber.slice(2, 7)}-${cleanedNumber.slice(7, 11)}`;
             }
+        }
 
-            number = number.replace(/\D/g, '');
-
-            const currentLength = number.length;
-
-            if (currentLength < 5) {
-                previousLength = currentLength;
-                return number;
-            }
-
-            if (currentLength >= 5 && currentLength <= 6) {
-                previousLength = currentLength;
-                return `(${number.slice(0, 2)}) ${number.slice(2)}`;
-            }
-
-            if (currentLength >= 10) {
-                const ddd = number.slice(0, 2);
-                const firstAfterDDD = number[2];
-                const isCellphone = firstAfterDDD >= 6 && firstAfterDDD <= 9;
-                const alreadyHasNine = number[2] === '9';
-
-                if (isCellphone && !alreadyHasNine && currentLength === 10) {
-                    number = `${number.slice(0, 2)}9${number.slice(2)}`;
-                }
-
-                previousLength = currentLength;
-
-                if (number.length <= 10) {
-                    return `(${ddd}) ${number.slice(2, 6)}-${number.slice(6)}`;
-                } else {
-                    return `(${ddd}) ${number.slice(2, 7)}-${number.slice(7)}`;
-                }
-            }
-
-            previousLength = currentLength;
-            return `(${number.slice(0, 2)}) ${number.slice(2, 7)}-${number.slice(7)}`;
+        function handleInput(input) {
+            // Atualiza o valor com a formatação correta
+            input.value = formatNumber(input.value);
         }
 
 

@@ -15,7 +15,7 @@ document.getElementById('openSidebar').addEventListener('click', function() {
         if (listicon) {
             listicon.src = 'static/img/list.svg'; // Troca para o ícone desativado
         }
-    }
+    }k
 });
 
 document.getElementById('searchBox').addEventListener('input', function() {
