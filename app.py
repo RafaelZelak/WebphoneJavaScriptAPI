@@ -86,6 +86,49 @@ def get_secret_for_phone_number(phone_number):
     finally:
         client.close()
 
+def get_all_callerid():
+    hostname = '192.168.15.252'
+    port = 22
+    username = 'root'
+    password = 'Dydf%hhffjk5s588ik2u@ud7aDF'
+    file_path = '/etc/asterisk/sip_additional.conf'
+
+    try:
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(hostname, port, username, password)
+
+        stdin, stdout, stderr = client.exec_command(f'cat {file_path}')
+        file_content = stdout.read().decode()
+
+        error_message = stderr.read().decode()
+        if error_message:
+            print(f"Erro ao ler o arquivo: {error_message}")
+            return None
+
+        sections = re.split(r'\n(?=\[\d+\])', file_content)
+        callerid_info = []
+        for section in sections:
+            matches = re.findall(r'callerid=([^\n]+)', section)
+            for match in matches:
+                # Extract name and ramal from callerid string
+                name_match = re.match(r'(.+?) <(\d+)>', match)
+                if name_match:
+                    name = name_match.group(1).strip()
+                    ramal = name_match.group(2).strip()
+                    callerid_info.append((name, ramal))
+
+        return callerid_info if callerid_info else None
+
+    except paramiko.SSHException as e:
+        print(f"Erro de SSH: {e}")
+        return None
+    except Exception as e:
+        print(f"Erro: {e}")
+        return None
+    finally:
+        client.close()
+
 @app.after_request
 def add_cache_control_headers(resp):
     resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
@@ -117,9 +160,20 @@ def home():
     full_name = session.get('full_name', 'Usuário')
     phone_number = session.get('phone_number', 'Não disponível')
 
+    # Obter o segredo para o número de telefone
     secret = get_secret_for_phone_number(phone_number) if phone_number != 'Não disponível' else 'Não disponível'
 
-    return render_template('index.html', full_name=full_name, phone_number=phone_number, secret=secret)
+    # Obter todas as informações de callerid
+    callerid_info = get_all_callerid()
+
+    # Passar a lista de callerid_info diretamente para o template
+    return render_template(
+        'index.html',
+        full_name=full_name,
+        phone_number=phone_number,
+        secret=secret,
+        callerid_info=callerid_info
+    )
 
 from flask import jsonify
 

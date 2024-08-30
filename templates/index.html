@@ -7,231 +7,11 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="{{ url_for('static', filename='webphone_api.js') }}"></script>
     <script src="{{ url_for('static', filename='webphone_config.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/softphone.css') }}">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <style>
-        .pico-close{
-            display: none;
-        }
-        .pico-overlay{
-            display: none !important;
-        }
-        .pico-content{
-            display: none !important;
-        }
-        #ce_modal_content{
-            display: none !important;
-        }
-        #ce_modal_content_inner{
-            display: none !important;
-        }
-        #ce_modal{
-            display: none !important;
-        }
-        #ce_modal_header{
-            display: none !important;
-        }
-        #ce_modal_content{
-            display: none !important;
-        }
-        #ce_modal_footer{
-            display: none !important;
-        }
-        .inputPhone {
-            background-color: transparent;
-            border: none;
-        }
-
-        .bg-dark-custom {
-            background-color: #111826;
-        }
-
-        .bg-light-custom {
-            background-color: #1f2a38;
-        }
-
-        .phone-container {
-            width: 100%;
-            max-width: 450px;
-            height: auto;
-            padding: 2rem;
-            background-color: #1f2a38a7 !important;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .display-input {
-            height: 100px;
-            width: 100%;
-            font-size: 2.5rem;
-            text-align: center;
-        }
-
-        .active-btn {
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
-            background-color: rgba(17, 24, 38, .4) !important;
-        }
-
-        .button-numeric {
-            padding: 1.2rem;
-            font-size: 2rem;
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            background-color: transparent;
-            transition: .2s;
-        }
-
-        .button-numeric:hover {
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
-            background-color: rgba(17, 24, 38, .4) !important;
-        }
-
-        .keypad-container {
-            margin-top: 1rem;
-            gap: 0.5rem;
-            flex-grow: 1;
-        }
-
-        .button-action {
-            color: aliceblue;
-            padding: 1rem;
-            font-size: 1.4rem;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .button-hangup {
-            background-color: #dc3545;
-        }
-
-        .button-hangup:hover {
-            background-color: #c82333;
-        }
-
-        .button-call {
-            background-color: #28a745;
-        }
-
-        .button-call:hover {
-            background-color: #218838;
-        }
-
-        .sufix {
-            position: relative;
-            text-align: center;
-            margin-top: 0.5rem;
-        }
-
-        .number {
-            padding-bottom: 1rem;
-        }
-
-        .NameRamal{
-            margin-top: -24px;
-            margin-bottom: 20px;
-            color: #6a7a8f;
-            font-size: 12pt;
-        }
-
-        .exit{
-            color: #f30920e1;
-            margin-left: 93%;
-            margin-top: -10px;
-            transition: .3s;
-            font-size: 12pt;
-            z-index: 10 !important;
-        }
-
-        .exit:hover{
-            color: #ff4444;
-        }
-        .aviso{
-            display: none;
-        }
-
-
-        @media screen and (max-height: 840px) {
-            .phone-container {
-                max-width: 450px;
-                height: auto;
-            }
-
-            .button-numeric {
-                padding: 0.75rem;
-                font-size: 2rem;
-            }
-
-            .button-action {
-                padding: 1rem;
-                font-size: 1.4rem;
-            }
-
-            .display-input {
-                height: 80px;
-                font-size: 2.5rem;
-            }
-        }
-
-        @media screen and (max-height: 730px) {
-            .phone-container {
-                max-width: 450px;
-                height: auto;
-            }
-
-            .button-numeric {
-                padding: 0.75rem;
-                font-size: 2rem;
-            }
-
-            .button-action {
-                padding: 1rem;
-                font-size: 1.4rem;
-            }
-
-            .display-input {
-                height: 80px;
-                font-size: 2.5rem;
-            }
-        }
-
-        @media screen and (max-height: 650px) {
-            .keypad-container{
-                display: none;
-            }
-            .phone-container {
-                max-width: 450px;
-                height: auto;
-            }
-
-            .button-numeric {
-                padding: 0.75rem;
-                font-size: 1.2rem;
-            }
-
-            .button-action {
-                padding: 1rem;
-                font-size: 2rem;
-            }
-
-            .display-input {
-                height: 80px;
-                font-size: 2.5rem;
-            }
-            .aviso{
-                display: block;
-            }
-        }
-        #mute-icon{
-            opacity: .5;
-            width: 30px;
-            height: 30px;
-            position: absolute;
-            margin-left: -30px;
-            margin-top: -5px;
-        }
-    </style>
 </head>
 <body class="bg-dark-custom flex flex-col items-center justify-center min-h-screen">
 
@@ -267,18 +47,55 @@
             <button class="bg-gray-700 text-white rounded-lg button-numeric" onclick="addNumber('#')">#</button>
         </div>
 
-        <div class="flex mb-4 space-x-4">
+        <div class="flex mb-4 space-x-4 divBtn">
             <button id="call-button" class="button-action button-call flex-1 rounded-lg" onclick="makeCallHandler()">Ligar</button>
         </div>
         <button id="muteButton">
             <img id="mute-icon" src="static/img/unmute.svg" alt="Mute">
         </button>
+        <div class="flex-1 p-6">
+            <!-- Button to open sidebar -->
+            <button id="openSidebar">
+                <img id="list-icon" src="static/img/list.svg" alt="List">
+            </button>
+        </div>
         <p class="aviso text-center block top-0 text-gray-400">Devido ao tamanho da tela, use o teclado para digitar o Núemro</p>
     </div>
 
     <div id="call-status" style="display: none;">Status da Chamada: Desconhecido</div>
 
-    <script src="{{ url_for('static', filename='softphone.js') }}"></script>
+    <div class="flex">
+        <!-- Sidebar -->
+        <div id="sidebar" class="fixed top-0 left-0 h-full w-64 sidebar sidebar-closed z-50">
+            <div class="p-4">
+                <input
+                    id="searchBox"
+                    type="text"
+                    placeholder="Buscar por nome"
+                    class="w-full p-2 mb-4 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
+                />
+                <div id="sidebarContent" class="sidebar-content">
+                    <h1 class="text-xl font-semibold mb-6">Lista de Ramais:</h1>
+                    <ul id="callerList">
+                        {% if callerid_info %}
+                            {% for name, ramal in callerid_info %}
+                                <li class="mb-2 caller-item">
+                                    <span class="font-bold">{{ name }}</span>: {{ ramal }}
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <li>Não há informações de Caller ID disponíveis.</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+
+    </div>
+
+    <script src="{{ url_for('static', filename='js/softphone.js') }}"></script>
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register("{{ url_for('static', filename='service-worker.js') }}")
@@ -373,14 +190,6 @@
                     updateDescription(display.value);
                     markButton(number);
                 }
-            }
-
-            function handleBackspace() {
-                display.focus();
-                let value = display.value.replace(/\D/g, '');
-                value = value.slice(0, -1);
-                display.value = formatNumber(value);
-                updateDescription(display.value);
             }
 
             function markButton(number) {
@@ -513,9 +322,6 @@
                 if (event.key >= '0' && event.key <= '9') {
                     event.preventDefault();
                     addNumber(event.key);
-                } else if (event.key === 'Backspace') {
-                    event.preventDefault();
-                    handleBackspace();
                 } else if (event.key === 'Enter') {
                     event.preventDefault();
                     makeCall();
