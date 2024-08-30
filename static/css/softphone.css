@@ -89,6 +89,7 @@
 }
 
 .button-hangup {
+    z-index: 999;
     background-color: #dc3545;
 }
 
@@ -97,6 +98,7 @@
 }
 
 .button-call {
+    z-index: 999;
     background-color: #28a745;
 }
 
@@ -234,8 +236,9 @@ display: flex;
 }
 .sidebar {
     transition: transform 0.3s ease-in-out;
-    background-color: #1f2a38; /* Cor do fundo da sidebar */
-    color: #e5e7eb; /* Cor do texto da sidebar */
+    background-color: #1f2a38;
+    color: #e5e7eb;
+    z-index: 9999;
 }
 .sidebar-open {
     transform: translateX(0);
@@ -264,4 +267,13 @@ display: flex;
 }
 .sidebar-content.hidden-scroll {
     scrollbar-width: none; /* Firefox */
+}
+.caller-item {
+    position: relative;
+    padding: 8px;
+    background-color:#1118268d;
+}
+
+.caller-item:hover{
+    background-color: #344050;
 }

@@ -66,7 +66,7 @@
 
     <div class="flex">
         <!-- Sidebar -->
-        <div id="sidebar" class="fixed top-0 left-0 h-full w-64 sidebar sidebar-closed z-50">
+        <div id="sidebar" class="fixed top-0 left-0 h-full w-[70rem] !w-[70rem] sidebar sidebar-closed z-30" style="width: 20rem;">
             <div class="p-4">
                 <input
                     id="searchBox"
@@ -79,9 +79,9 @@
                     <ul id="callerList">
                         {% if callerid_info %}
                             {% for name, ramal in callerid_info %}
-                                <li class="mb-2 caller-item">
-                                    <span class="font-bold">{{ name }}</span>: {{ ramal }}
-                                </li>
+                            <li class="mb-2 caller-item relative rounded bg-gray-800 text-white cursor-pointer hover:bg-gray-700" onclick="addNumberToList('{{ ramal }}'); addSufixName('{{ name }}');">
+                                <span class="font-bold">{{ name }}</span>: {{ ramal }}
+                            </li>
                             {% endfor %}
                         {% else %}
                             <li>Não há informações de Caller ID disponíveis.</li>
@@ -90,9 +90,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Content -->
-
     </div>
 
     <script src="{{ url_for('static', filename='js/softphone.js') }}"></script>
@@ -420,6 +417,7 @@
             window.hangUp = function() {
                 webphone_api.hangup();
                 stopTimer();
+                description.innerText = 'Sem Formato';
                 display.disabled = false;
                 display.value = display.getAttribute('');
                 updateButtonState(false);
@@ -459,6 +457,15 @@
         function Accept()
         {
             webphone_api.accept();
+        }
+
+        function addNumberToList(ramal) {
+            const input = document.getElementById('display');
+            input.value = ramal; // Define o valor do input para o ramal selecionado
+        }
+
+        function addSufixName(name) {
+            description.innerText = "Ramal: " + name;
         }
 
         function handleCdr(caller, called, connectTime, duration, direction, peerDisplayName, reason, line, callId) {
@@ -538,6 +545,7 @@
             hangupButton.innerText = 'Recusar';
             hangupButton.onclick = function() {
                 pararSom();
+                description.innerText = 'Sem Formato';
                 webphone_api.hangup();
                 document.body.removeChild(popupContainer);
             };
