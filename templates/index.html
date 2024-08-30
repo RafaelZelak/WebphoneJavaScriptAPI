@@ -224,6 +224,7 @@
             }
         }
         #mute-icon{
+            opacity: .5;
             width: 30px;
             height: 30px;
             position: absolute;
@@ -357,7 +358,7 @@
                     } else if (firstDigitAfterDDD >= '6' && firstDigitAfterDDD <= '9') {
                         description.innerText = 'Número de Celular';
                     } else {
-                        description.innerText = '';
+                        description.innerText = 'Sem Formato';
                     }
                 } else {
                     description.innerText = 'Sem Formato';
@@ -403,28 +404,67 @@
             }
 
 
-            function updateCallStatus() {
-                if (typeof webphone_api !== 'undefined') {
-                    const isInCall = webphone_api.isincall();
+            (function() {
+                // Definindo a função no escopo global
+                window.updateCallStatus = function() {
+                    if (typeof webphone_api !== 'undefined') {
+                        const isInCall = webphone_api.isincall();
 
-                    if (isInCall) {
-                        if (!callStartTime) {
-                            callStartTime = new Date();
-                            startTimer();
-                        }
-                        callStatus.innerText = `Status da Chamada: Em Chamada - ${formatTime(getElapsedTime())}`;
-                        title.innerText = `Em Chamada - ${formatTime(getElapsedTime())}`;
-                    } else {
-                        if (callStartTime) {
+                        if (!isInCall && callStartTime) {
+                            // Se não estiver em chamada e o timer estiver em andamento, pare o timer
                             callStartTime = null;
                             stopTimer();
                         }
-                        callStatus.innerText = 'Status da Chamada: Fora de Chamada';
-                        title.innerText = 'Softphone Setup';
+
+                        // Atualiza o status da chamada e o título da página
+                        if (isInCall) {
+                            // Somente atualiza o título se o timer estiver ativo
+                            if (callStartTime) {
+                                callStatus.innerText = `Status da Chamada: Em Chamada - ${formatTime(getElapsedTime())}`;
+                                title.innerText = `Em Chamada - ${formatTime(getElapsedTime())}`;
+                            } else {
+                                callStatus.innerText = 'Status da Chamada: Em Chamada';
+                            }
+                        } else {
+                            callStatus.innerText = 'Status da Chamada: Fora de Chamada';
+                            title.innerText = 'Softphone Setup';
+                        }
+
+                        // Atualiza o estado dos botões de chamada
+                        updateButtonState(isInCall);
                     }
-                    updateButtonState(isInCall);
+                };
+
+                const originalConsoleLog = console.log;
+
+                console.log = function(...args) {
+                    const message = args.join(' ');
+                    const regex = /NOTIFICATION,PRESENCE,\d+,Open,Speaking$/;
+
+                    if (regex.test(message.trim())) {
+                        // Trigger: A chamada foi iniciada, inicie o timer
+                        handleNotificationPresence();
+                    }
+
+                    originalConsoleLog.apply(console, args);
+                };
+
+                function handleNotificationPresence() {
+                    // Atualiza o status da chamada e inicia o timer
+                    console.log('Trigger acionado: NOTIFICATION,PRESENCE,Open,Speaking detectado');
+                    if (!callStartTime) {
+                        callStartTime = new Date();
+                        startTimer();
+                    }
                 }
-            }
+
+                // Certifique-se de que o código a seguir esteja no escopo global
+                window.onload = function() {
+                    updateCallStatus(); // Chama updateCallStatus na inicialização
+                };
+
+            })();
+
             function makeCallHandler(event) {
                 event.preventDefault();
                 const input = document.getElementById('display');
@@ -592,6 +632,9 @@
                 webphone_api.onCallStateChange(function (status, direction, peername, peerdisplayname, line) {
                     if (status === 'setup') {
                         if (direction === 2) {
+                            som = new Audio('static/sound/toque.mp3');
+                            som.loop = true;
+                            som.play();
                             CallPopup(peername);
                         }
                     }
@@ -600,6 +643,16 @@
                 console.error('webphone_api não está definido');
             }
         };
+        let som = null;
+
+        function pararSom() {
+        if (som) {
+            som.pause();
+            som.currentTime = 0
+            som = null;
+        }
+        }
+
         function Hangup()
         {
             webphone_api.hangup();
@@ -663,8 +716,9 @@
         document.addEventListener('DOMContentLoaded', setupMuteButton);
 
         function CallPopup(peername) {
+
             const popupContainer = document.createElement('div');
-            popupContainer.className = 'fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50';
+            popupContainer.className = 'fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 opacity-0 transition-opacity duration-500'; // Começa com opacidade 0 e animação de transição
 
             const popupContent = document.createElement('div');
             popupContent.style.backgroundColor = '#111826';
@@ -675,6 +729,8 @@
             const popupText = document.createElement('p');
             popupText.className = 'text-xl font-semibold text-white mb-4 text-center';
             popupText.innerText = `Recebendo Chamada de ${peername}!`;
+            const display = document.getElementById('display');
+            display.value = peername;
 
             const buttonContainer = document.createElement('div');
             buttonContainer.className = 'flex justify-around';
@@ -683,6 +739,7 @@
             hangupButton.className = 'bg-red-500 hover:bg-red-600 text-white font-bold py-7 px-14 rounded';
             hangupButton.innerText = 'Recusar';
             hangupButton.onclick = function() {
+                pararSom();
                 webphone_api.hangup();
                 document.body.removeChild(popupContainer);
             };
@@ -691,6 +748,7 @@
             acceptButton.className = 'bg-green-500 hover:bg-green-600 text-white font-bold px-14 rounded'; // Aumenta o tamanho dos botões
             acceptButton.innerText = 'Aceitar';
             acceptButton.onclick = function() {
+                pararSom();
                 webphone_api.accept();
                 document.body.removeChild(popupContainer);
             };
@@ -704,7 +762,14 @@
             popupContainer.appendChild(popupContent);
 
             document.body.appendChild(popupContainer);
+
+            // Delay para permitir que o elemento seja adicionado ao DOM antes de aplicar a animação
+            setTimeout(() => {
+                popupContainer.classList.remove('opacity-0');
+                popupContainer.classList.add('opacity-100');
+            }, 10); // Atraso mínimo para acionar a transição
         }
+
 
         async function checkCallStatus() {
             while (true) {

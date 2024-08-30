@@ -1,18 +1,21 @@
-// scripts.js
-
 document.addEventListener('DOMContentLoaded', () => {
     const togglePassword = document.querySelector('#toggle-password');
     const passwordField = document.querySelector('#password');
     const eyeIcon = document.querySelector('#eye-icon');
 
-    togglePassword.addEventListener('click', () => {
-        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordField.setAttribute('type', type);
-        eyeIcon.classList.toggle('text-gray-500');
-        eyeIcon.classList.toggle('text-gray-300');
-    });
+    if (togglePassword && passwordField && eyeIcon) {
+        togglePassword.addEventListener('click', () => {
+            const isPassword = passwordField.getAttribute('type') === 'password';
+            passwordField.setAttribute('type', isPassword ? 'text' : 'password');
 
-    // Remove alert messages after 3 seconds with animation
+            // Alterar opacidade do ícone ao clicar
+            eyeIcon.style.opacity = isPassword ? '0.5' : '1';
+        });
+    } else {
+        console.error('Elementos não encontrados: Verifique os IDs dos elementos HTML.');
+    }
+
+    // Remover alertas após 3 segundos com animação
     const alertContainer = document.querySelector('#alert-container');
     if (alertContainer) {
         setTimeout(() => {
