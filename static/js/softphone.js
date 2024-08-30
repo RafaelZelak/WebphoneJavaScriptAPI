@@ -8,12 +8,12 @@ document.getElementById('openSidebar').addEventListener('click', function() {
     if (sidebar.classList.contains('sidebar-open')) {
         content.classList.remove('hidden-scroll');
         if (listicon) {
-            listicon.src = 'static/img/listActive.svg'; // Troca para o ícone ativo
+            listicon.src = 'static/img/listActive.svg';
         }
     } else {
-        setTimeout(() => content.classList.add('hidden-scroll'), 300); // Esperar animação da sidebar
+        setTimeout(() => content.classList.add('hidden-scroll'), 300);
         if (listicon) {
-            listicon.src = 'static/img/list.svg'; // Troca para o ícone desativado
+            listicon.src = 'static/img/list.svg';
         }
     }k
 });

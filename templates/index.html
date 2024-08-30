@@ -25,7 +25,7 @@
         <h1 id="title" class="text-2xl font-semibold mb-4 text-center text-white">Softphone Setup</h1>
 
         <div class="mb-4 number">
-            <input oninput="handleInput(this)" id="display" type="text" class="w-full border border-gray-700 rounded-lg p-4 text-center bg-gray-900 text-white focus:outline-none display-input inputPhone" maxlength="15">
+            <input id="display" type="text" class="w-full border border-gray-700 rounded-lg p-4 text-center bg-gray-900 text-white focus:outline-none display-input inputPhone" maxlength="15">
             <p id="description" class="text-center text-white mt-2 sufix">Sem Formato</p>
         </div>
 
@@ -54,7 +54,6 @@
             <img id="mute-icon" src="static/img/unmute.svg" alt="Mute">
         </button>
         <div class="flex-1 p-6">
-            <!-- Button to open sidebar -->
             <button id="openSidebar">
                 <img id="list-icon" src="static/img/list.svg" alt="List">
             </button>
@@ -65,7 +64,6 @@
     <div id="call-status" style="display: none;">Status da Chamada: Desconhecido</div>
 
     <div class="flex">
-        <!-- Sidebar -->
         <div id="sidebar" class="fixed top-0 left-0 h-full w-[70rem] !w-[70rem] sidebar sidebar-closed z-30" style="width: 20rem;">
             <div class="p-4">
                 <input
@@ -133,12 +131,6 @@
                 return `(${cleanedNumber.slice(0, 2)}) ${cleanedNumber.slice(2, 7)}-${cleanedNumber.slice(7, 11)}`;
             }
         }
-
-        function handleInput(input) {
-            // Atualiza o valor com a formatação correta
-            input.value = formatNumber(input.value);
-        }
-
 
             function updateDescription(number) {
                 number = number.replace(/\D/g, '');
@@ -289,7 +281,6 @@
                 }
             }
 
-            display.addEventListener('input', handleInput);
 
             document.addEventListener('keydown', function(event) {
                 if (event.ctrlKey && event.key === 'v') {
@@ -503,12 +494,14 @@
         function CallPopup(peername) {
 
             const popupContainer = document.createElement('div');
+            popupContainer.style.zIndex = '99998';
             popupContainer.className = 'fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 opacity-0 transition-opacity duration-500'; // Começa com opacidade 0 e animação de transição
 
             const popupContent = document.createElement('div');
             popupContent.style.backgroundColor = '#111826';
             popupContent.style.width = '400px';
             popupContent.style.height = '150px';
+            popupContent.style.zIndex = '99999'
             popupContent.className = 'rounded-lg shadow-lg p-6';
 
             const popupText = document.createElement('p');
