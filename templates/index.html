@@ -96,6 +96,7 @@
                         {% else %}
                             <li>Não há informações de Caller ID disponíveis.</li>
                         {% endif %}
+                        <li><br></li>
                     </ul>
                 </div>
             </div>
@@ -104,6 +105,7 @@
 
     <script src="{{ url_for('static', filename='js/softphone.js') }}"></script>
     <script>
+        console.log = function() {};
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register("{{ url_for('static', filename='service-worker.js') }}")
                 .then(registration => {

@@ -82,7 +82,7 @@
 }
 
 .button-action {
-    color: aliceblue;
+    color: rgb(255, 255, 255);
     padding: 1rem;
     font-size: 1.4rem;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
@@ -90,20 +90,20 @@
 
 .button-hangup {
     z-index: 999;
-    background-color: #dc3545;
+    background-color: #bf5050e7;
 }
 
 .button-hangup:hover {
-    background-color: #c82333;
+    background-color: rgba(196, 57, 71, 0.767);
 }
 
 .button-call {
     z-index: 999;
-    background-color: #28a745;
+    background-color: #50bfa0cc;
 }
 
 .button-call:hover {
-    background-color: #218838;
+    background-color: #288d70d7;
 }
 
 .sufix {
