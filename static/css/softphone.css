@@ -124,17 +124,14 @@
 }
 
 .exit{
-    color: #f30920e1;
-    margin-left: 93%;
-    margin-top: -10px;
-    transition: .3s;
-    font-size: 12pt;
-    z-index: 10 !important;
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    margin-top: 680px;
+    margin-left: 23px;
+    z-index: 988;
 }
 
-.exit:hover{
-    color: #ff4444;
-}
 .aviso{
     display: none;
 }
@@ -160,6 +157,16 @@
         height: 80px;
         font-size: 2.5rem;
     }
+
+
+    .exit{
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        margin-top: 610px;
+        margin-left: 23px;
+        z-index: 988;
+    }
 }
 
 @media screen and (max-height: 730px) {
@@ -182,6 +189,7 @@
         height: 80px;
         font-size: 2.5rem;
     }
+
 }
 
 @media screen and (max-height: 650px) {
@@ -208,7 +216,18 @@
         font-size: 2.5rem;
     }
     .aviso{
+        margin-top: 40px;
         display: block;
+    }
+
+
+    .exit{
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        margin-top: 325px;
+        margin-left: 23px;
+        z-index: 988;
     }
 }
 #mute-icon{

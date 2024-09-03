@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Softphone</title>
+    <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="{{ url_for('static', filename='webphone_api.js') }}"></script>
     <script src="{{ url_for('static', filename='webphone_config.js') }}"></script>
@@ -16,9 +17,6 @@
 <body class="bg-dark-custom flex flex-col items-center justify-center min-h-screen">
 
     <div class="w-full max-w-xs bg-light-custom shadow-lg rounded-lg p-6 phone-container">
-        <form action="{{ url_for('logout') }}" method="POST" class="exit">
-            <button type="submit">Sair</button>
-        </form>
         <p class="text-center block NameRamal top-0">
             Logado como: {{full_name}}, {{phone_number}}
         </p>
@@ -58,6 +56,11 @@
                 <img id="list-icon" src="static/img/list.svg" alt="List">
             </button>
         </div>
+        <form action="{{ url_for('logout') }}" method="POST" class="exit">
+            <button type="submit">
+                <img id="list-icon" src="static/img/exit.svg" alt="List">
+            </button>
+        </form>
         <div class="soundBar">
             <div class="volume-control micControl">
                 <input type="range" id="micVolume" min="0" max="100" value="50">
