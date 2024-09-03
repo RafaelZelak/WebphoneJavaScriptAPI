@@ -226,6 +226,7 @@
     height: 30px;
     margin-left: 360px;
     margin-top: 19px;
+    z-index: 988;
 }
 .divBtn{
     margin-top: 20px;
@@ -276,4 +277,91 @@ display: flex;
 
 .caller-item:hover{
     background-color: #344050;
+}
+.soundBar{
+    margin-left: 70px;
+    color: white;
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 13px; /* Espaço entre o ícone e a barra de volume */
+    position: relative;
+    margin-left: -100px;
+}
+
+.speaker-icon {
+    opacity: .5;
+    width: 30px;
+    height: 30px;
+}
+
+.micControl{
+    left: 50px;
+}
+
+.spkControl{
+    margin-top: 20px;
+    margin-bottom: -20px;
+    margin-left: -93px;
+}
+
+.volume-control input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 150px; /* Largura da barra */
+    height: 6px; /* Altura da barra */
+    background: #1f2a38; /* Cor de fundo da barra */
+    border-radius: 5px; /* Arredondamento da barra */
+    outline: none; /* Remove o contorno ao focar */
+    position: relative; /* Adiciona posição relativa para o controle do thumb */
+}
+
+.volume-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px; /* Largura do botão */
+    height: 16px; /* Altura do botão */
+    background: #50bfa0; /* Cor do botão */
+    border-radius: 50%; /* Arredondamento do botão */
+    cursor: pointer; /* Mostra um cursor de mão ao passar por cima */
+    margin-top: -5px; /* Centraliza o botão verticalmente */
+}
+
+.volume-control input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: #50bfa0;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-top: -5px; /* Centraliza o botão verticalmente no Firefox */
+}
+
+.volume-control input[type="range"]::-ms-thumb {
+    width: 16px;
+    height: 16px;
+    background: #50bfa0;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.volume-control input[type="range"]::-webkit-slider-runnable-track {
+    background-color: #1f2a38;
+    height: 6px;
+    border-radius: 5px;
+}
+
+.volume-control input[type="range"]::-moz-range-track {
+    background-color: #1f2a38;
+    height: 6px;
+    border-radius: 5px;
+}
+
+.volume-control input[type="range"]::-ms-track {
+    background-color: #1f2a38;
+    height: 6px;
+    border-radius: 5px;
+    border: none;
+    color: transparent;
 }

@@ -31,3 +31,21 @@ document.getElementById('searchBox').addEventListener('input', function() {
         }
     });
 });
+
+const speakerVolume = document.getElementById("speakerVolume");
+const speakerVolumeValue = document.getElementById("speakerVolumeValue");
+const speakerIcon = document.getElementById("speakerIcon");
+
+speakerVolume.addEventListener("input", () => {
+    const volume = speakerVolume.value;
+    speakerVolumeValue.textContent = volume;
+
+    if (volume == 0) {
+        speakerIcon.src = "static/img/speaker0.svg";
+    } else if (volume > 0 && volume <= 50) {
+        speakerIcon.src = "static/img/speaker50.svg";
+    } else {
+        speakerIcon.src = "static/img/speaker100.svg";
+    }
+});
+

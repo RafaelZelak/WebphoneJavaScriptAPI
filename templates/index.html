@@ -58,6 +58,18 @@
                 <img id="list-icon" src="static/img/list.svg" alt="List">
             </button>
         </div>
+        <div class="soundBar">
+            <div class="volume-control micControl">
+                <input type="range" id="micVolume" min="0" max="100" value="50">
+                <span id="micVolumeValue">50</span>%
+            </div>
+
+            <div class="volume-control spkControl">
+                <img id="speakerIcon" src="static/img/speaker50.svg" alt="Speaker Icon" class="speaker-icon">
+                <input type="range" id="speakerVolume" min="0" max="100" value="50">
+                <span id="speakerVolumeValue">50</span>%
+            </div>
+        </div>
         <p class="aviso text-center block top-0 text-gray-400">Devido ao tamanho da tela, use o teclado para digitar o Núemro</p>
     </div>
 
@@ -76,9 +88,9 @@
                     <h1 class="text-xl font-semibold mb-6">Lista de Ramais:</h1>
                     <ul id="callerList">
                         {% if callerid_info %}
-                            {% for name, ramal in callerid_info %}
-                            <li class="mb-2 caller-item relative rounded bg-gray-800 text-white cursor-pointer hover:bg-gray-700" onclick="addNumberToList('{{ ramal }}'); addSufixName('{{ name }}');">
-                                <span class="font-bold">{{ name }}</span>: {{ ramal }}
+                            {% for name, home_phone, group_name in callerid_info %}
+                            <li class="mb-2 caller-item relative rounded bg-gray-800 text-white cursor-pointer hover:bg-gray-700" onclick="addNumberToList('{{ home_phone }}'); addSufixName('{{ name }}');">
+                                <span class="font-bold">{{ name }}</span>: {{ home_phone }}
                             </li>
                             {% endfor %}
                         {% else %}
@@ -103,7 +115,34 @@
         }
     </script>
     <script>
-        console.log = function() {};
+        function aumentarVolume() {
+            webphone_api.setvolume(0, 100); // Volume máximo do microfone
+            webphone_api.setvolume(1, 100); // Volume máximo dos alto-falantes
+            console.log("Todos os volumes foram ajustados para o máximo.");
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Obter os elementos da barra de volume e valores
+            const micVolumeSlider = document.getElementById("micVolume");
+            const micVolumeValue = document.getElementById("micVolumeValue");
+
+            const speakerVolumeSlider = document.getElementById("speakerVolume");
+            const speakerVolumeValue = document.getElementById("speakerVolumeValue");
+
+            // Atualizar o volume do microfone
+            micVolumeSlider.addEventListener("input", function () {
+                const volume = parseInt(micVolumeSlider.value);
+                micVolumeValue.textContent = volume;
+                webphone_api.setvolume(0, volume); // Ajusta o volume do microfone
+            });
+
+            // Atualizar o volume do alto-falante
+            speakerVolumeSlider.addEventListener("input", function () {
+                const volume = parseInt(speakerVolumeSlider.value);
+                speakerVolumeValue.textContent = volume;
+                webphone_api.setvolume(1, volume); // Ajusta o volume do alto-falante
+            });
+        });
         window.onload = function() {
             const display = document.getElementById('display');
             const description = document.getElementById('description');
@@ -115,6 +154,7 @@
             let timerInterval = null;
 
             let previousLength = 0;
+
 
             function formatNumber(number) {
             // Remove caracteres não numéricos
@@ -304,6 +344,7 @@
                         webphone_api.setparameter('password', '{{ secret }}');
                         webphone_api.setparameter('loglevel', '1');
                         webphone_api.start();
+                        aumentarVolume();
                     }
                 });
 
