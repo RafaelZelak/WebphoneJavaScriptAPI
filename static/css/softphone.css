@@ -123,14 +123,6 @@
     font-size: 12pt;
 }
 
-.exit{
-    position: absolute;
-    width: 30px;
-    height: 30px;
-    margin-top: 680px;
-    margin-left: 23px;
-    z-index: 988;
-}
 
 .aviso{
     display: none;
@@ -158,15 +150,6 @@
         font-size: 2.5rem;
     }
 
-
-    .exit{
-        position: absolute;
-        width: 30px;
-        height: 30px;
-        margin-top: 610px;
-        margin-left: 23px;
-        z-index: 988;
-    }
 }
 
 @media screen and (max-height: 730px) {
@@ -220,33 +203,8 @@
         display: block;
     }
 
+}
 
-    .exit{
-        position: absolute;
-        width: 30px;
-        height: 30px;
-        margin-top: 325px;
-        margin-left: 23px;
-        z-index: 988;
-    }
-}
-#mute-icon{
-    position: absolute;
-    opacity: .5;
-    width: 30px;
-    height: 30px;
-    margin-left: -25px;
-    margin-top: 55px;
-}
-#list-icon{
-    position: absolute;
-    opacity: .5;
-    width: 30px;
-    height: 30px;
-    margin-left: 360px;
-    margin-top: 19px;
-    z-index: 988;
-}
 .divBtn{
     margin-top: 20px;
     margin-bottom: -30px;
@@ -297,34 +255,7 @@ display: flex;
 .caller-item:hover{
     background-color: #344050;
 }
-.soundBar{
-    margin-left: 70px;
-    color: white;
-}
 
-.volume-control {
-    display: flex;
-    align-items: center;
-    gap: 13px; /* Espaço entre o ícone e a barra de volume */
-    position: relative;
-    margin-left: -100px;
-}
-
-.speaker-icon {
-    opacity: .5;
-    width: 30px;
-    height: 30px;
-}
-
-.micControl{
-    left: 50px;
-}
-
-.spkControl{
-    margin-top: 20px;
-    margin-bottom: -20px;
-    margin-left: -93px;
-}
 
 .volume-control input[type="range"] {
     -webkit-appearance: none;
@@ -383,4 +314,67 @@ display: flex;
     border-radius: 5px;
     border: none;
     color: transparent;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0px;
+    margin-top: 40px;
+    margin-bottom: -20px;
+}
+
+#mute-icon, #list-icon, .speaker-icon {
+    opacity: .5;
+    width: 30px;
+    height: 30px;
+}
+
+#exit-icon{
+    opacity: .5;
+    width: 35px;
+    height: 35px;
+}
+
+.soundBar {
+    display: flex;
+    flex-direction: column;
+    color: white;
+    margin-top: -10px;
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.micControl, .spkControl {
+    margin-top: 10px;
+}
+
+/* Novo estilo para empilhar ícones verticalmente */
+.icon-group {
+    display: flex;
+    flex-direction: column; /* Empilha os itens na vertical */
+    align-items: center; /* Centraliza os itens horizontalmente */
+    gap: 10px; /* Espaço entre os botões */
+    margin-left: 50px;
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.micControl, .spkControl {
+    margin-top: 10px;
+}
+
+#micVolumeValue, #speakerVolumeValue {
+    display: inline-block;
+    width: 2.5em; /* Largura fixa suficiente para três dígitos */
+    text-align: right; /* Alinha os números à direita */
 }

@@ -48,4 +48,3 @@ speakerVolume.addEventListener("input", () => {
         speakerIcon.src = "static/img/speaker100.svg";
     }
 });
-

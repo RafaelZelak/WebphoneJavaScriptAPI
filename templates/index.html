@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Softphone</title>
-    <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/static/img/favicon.ico" type="image/svg+xml">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="{{ url_for('static', filename='webphone_api.js') }}"></script>
     <script src="{{ url_for('static', filename='webphone_config.js') }}"></script>
@@ -15,7 +15,6 @@
     <meta http-equiv="Expires" content="0" />
 </head>
 <body class="bg-dark-custom flex flex-col items-center justify-center min-h-screen">
-
     <div class="w-full max-w-xs bg-light-custom shadow-lg rounded-lg p-6 phone-container">
         <p class="text-center block NameRamal top-0">
             Logado como: {{full_name}}, {{phone_number}}
@@ -48,29 +47,33 @@
         <div class="flex mb-4 space-x-4 divBtn">
             <button id="call-button" class="button-action button-call flex-1 rounded-lg" onclick="makeCallHandler()">Ligar</button>
         </div>
-        <button id="muteButton">
-            <img id="mute-icon" src="static/img/unmute.svg" alt="Mute">
-        </button>
-        <div class="flex-1 p-6">
-            <button id="openSidebar">
-                <img id="list-icon" src="static/img/list.svg" alt="List">
-            </button>
-        </div>
-        <form action="{{ url_for('logout') }}" method="POST" class="exit">
-            <button type="submit">
-                <img id="list-icon" src="static/img/exit.svg" alt="List">
-            </button>
-        </form>
-        <div class="soundBar">
-            <div class="volume-control micControl">
-                <input type="range" id="micVolume" min="0" max="100" value="50">
-                <span id="micVolumeValue">50</span>%
+        <div class="controls">
+            <div class="soundBar">
+                <div class="volume-control micControl">
+                    <button id="muteButton">
+                        <img id="mute-icon" src="static/img/unmute.svg" alt="Mute">
+                    </button>
+                    <input type="range" id="micVolume" min="0" max="100" value="50">
+                    <span id="micVolumeValue">50</span>%
+                </div>
+
+                <div class="volume-control spkControl">
+                    <img id="speakerIcon" src="static/img/speaker50.svg" alt="Speaker Icon" class="speaker-icon">
+                    <input type="range" id="speakerVolume" min="0" max="100" value="50">
+                    <span id="speakerVolumeValue">50</span>%
+                </div>
             </div>
 
-            <div class="volume-control spkControl">
-                <img id="speakerIcon" src="static/img/speaker50.svg" alt="Speaker Icon" class="speaker-icon">
-                <input type="range" id="speakerVolume" min="0" max="100" value="50">
-                <span id="speakerVolumeValue">50</span>%
+            <!-- Contêiner que empilha os botões verticalmente -->
+            <div class="icon-group">
+                <button id="openSidebar">
+                    <img id="list-icon" src="static/img/list.svg" alt="List">
+                </button>
+                <form action="{{ url_for('logout') }}" method="POST" class="exit">
+                    <button type="submit">
+                        <img id="exit-icon" src="static/img/exit.svg" alt="Exit">
+                    </button>
+                </form>
             </div>
         </div>
         <p class="aviso text-center block top-0 text-gray-400">Devido ao tamanho da tela, use o teclado para digitar o Núemro</p>
@@ -108,7 +111,6 @@
 
     <script src="{{ url_for('static', filename='js/softphone.js') }}"></script>
     <script>
-        console.log = function() {};
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register("{{ url_for('static', filename='service-worker.js') }}")
                 .then(registration => {
@@ -134,17 +136,35 @@
             const speakerVolumeSlider = document.getElementById("speakerVolume");
             const speakerVolumeValue = document.getElementById("speakerVolumeValue");
 
-            // Atualizar o volume do microfone
+            // Restaurar os volumes do Local Storage
+            const savedMicVolume = localStorage.getItem("micVolume");
+            const savedSpeakerVolume = localStorage.getItem("speakerVolume");
+
+            if (savedMicVolume !== null) {
+                micVolumeSlider.value = savedMicVolume;
+                micVolumeValue.textContent = savedMicVolume;
+                webphone_api.setvolume(0, parseInt(savedMicVolume));
+            }
+
+            if (savedSpeakerVolume !== null) {
+                speakerVolumeSlider.value = savedSpeakerVolume;
+                speakerVolumeValue.textContent = savedSpeakerVolume;
+                webphone_api.setvolume(1, parseInt(savedSpeakerVolume));
+            }
+
+            // Atualizar e salvar o volume do microfone
             micVolumeSlider.addEventListener("input", function () {
                 const volume = parseInt(micVolumeSlider.value);
                 micVolumeValue.textContent = volume;
+                localStorage.setItem("micVolume", volume);
                 webphone_api.setvolume(0, volume); // Ajusta o volume do microfone
             });
 
-            // Atualizar o volume do alto-falante
+            // Atualizar e salvar o volume do alto-falante
             speakerVolumeSlider.addEventListener("input", function () {
                 const volume = parseInt(speakerVolumeSlider.value);
                 speakerVolumeValue.textContent = volume;
+                localStorage.setItem("speakerVolume", volume);
                 webphone_api.setvolume(1, volume); // Ajusta o volume do alto-falante
             });
         });
@@ -349,7 +369,6 @@
                         webphone_api.setparameter('password', '{{ secret }}');
                         webphone_api.setparameter('loglevel', '1');
                         webphone_api.start();
-                        aumentarVolume();
                     }
                 });
 
